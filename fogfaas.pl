@@ -31,7 +31,7 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
 
 placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
     app(AId, Services),
-    placeServices(AOp, Services, [], ServicePlacement, [], Caps).
+    placeServices(AOp, Services, [], ServicePlacement, [], Caps),
     placeAllFunctions(AOp, ServicePlacement, [], FunctionPlacement, Caps).
 
 placeAllFunctions(_, [], FP, FP, _).
