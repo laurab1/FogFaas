@@ -73,7 +73,8 @@ placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewC
       trusts2(AOp, OpN),
       checkPlatforms(PReqs, FPlats),
       checkContext(AOp, Args, NId, OpN, Geo, L),
-      HwReqs =< HwCaps, checkHw(HwCaps, 0, NId, Caps, NewCaps).  
+      remainingCaps(HwCaps, NId, Caps, Rem),
+      HwReqs =< Rem.  
 
 placeFunctions(AOp, SId, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
    func(FId, Args, HwReqs, PReqs, TUnits),
@@ -140,12 +141,11 @@ checkHw(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, NewFree)|Rest]) :-
 HwReqs =< Free,
 NewFree is Free - HwReqs.
 
-checkHwSeq(HwCaps, _, NId, [], [(NId, HwCaps)]).
-checkHwSeq(HwCaps, HwReqs, NId, [(NId2, R) | Rest], [(NId2, R) | NewFree]) :- 
+remainingCaps(HwCaps, NId, [], HwCaps).
+remainingCaps(HwCaps, NId, [(NId2, R) | Rest], Rem) :- 
 NId \== NId2,
-    checkHw(HwCaps, HwReqs, NId, Rest, NewFree).
-checkHwSeq(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, Free)|Rest]) :-
-HwReqs =< Free.
+    remainingCaps(HwCaps, NId, Rest, Rem).
+remainingCaps(_, NId, [(NId, R) | Rest], R).
 
 labelF(ann, Args, ts).
 labelF(ann, Args, s) :- findall(X, ts(X, Args), []).
@@ -200,7 +200,7 @@ func(div, [z,z], 2, python, 20).
 service(service1, triggerX, sum, 1, [ubuntu], [eu]).
 service(service2, triggerY, div, 1, [sql], [eu]).
 
-node(n1, amazon, 2, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
+node(n1, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n1).
 firewall(n1).
 
