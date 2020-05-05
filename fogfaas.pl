@@ -1,3 +1,5 @@
+%node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo)
+
 %%%%%%%%% Working (problog) code %%%%%%%%%
 
 :- use_module(library(lists)).
@@ -22,9 +24,9 @@ app(app1, [service1, service2]).
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
     service(SId, _, Prog, HwReqs, PReqs, Geo),
-    node(NId, OpN, HwCaps, Plats, CostPU, NodeLoc),
+    node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
-    member(PReqs, Plats),
+    subset(PReqs, SPlats),
     trusts2(AOp, OpN),
     checkHw(HwCaps, HwReqs, NId, Caps, TmpCaps),
     placeServices(AOp, Rest, Placement, NewPlacement, TmpCaps, NewCaps).
@@ -54,9 +56,9 @@ placeFunctions(AOp, SId, par(F1, F2), Placement, NewPlacement, Caps, NewCaps) :-
 
 placeParFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
       func(FId, Args, HwReqs, PReqs, TUnits),
-      node(NId, OpN, HwCaps, Plats, CostPU, Geo),
+      node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
       trusts2(AOp, OpN),
-      checkPlatforms(PReqs, Plats),
+      checkPlatforms(PReqs, FPlats),
       checkContext(AOp, Args, NId, OpN, Geo, L),
       HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).   
 
@@ -67,35 +69,35 @@ placeFunctions(AOp, SId, seq(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
 
 placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
       func(FId, Args, HwReqs, PReqs, TUnits),
-      node(NId, OpN, HwCaps, Plats, CostPU, Geo),
+      node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
       trusts2(AOp, OpN),
-      checkPlatforms(PReqs, Plats),
+      checkPlatforms(PReqs, FPlats),
       checkContext(AOp, Args, NId, OpN, Geo, L),
       HwReqs =< HwCaps, checkHw(HwCaps, 0, NId, Caps, NewCaps).  
 
 placeFunctions(AOp, SId, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
    func(FId, Args, HwReqs, PReqs, TUnits),
-   node(NId, OpN, HwCaps, Plats, CostPU, Geo),
+   node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
    trusts2(AOp, OpN),
-   checkPlatforms(PReqs, Plats),
+   checkPlatforms(PReqs, FPlats),
    checkContext(AOp, Args, NId, OpN, Geo, L),
    HwReqs =< HwCaps,
    placeFunctions(AOp, SId, P1, Placement, NewPlacement, Caps, NewCaps).
 
 placeFunctions(AOp, SId, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
    func(FId, Args, HwReqs, PReqs, TUnits),
-   node(NId, OpN, HwCaps, Plats, CostPU, Geo),
+   node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
    trusts2(AOp, OpN),
-   checkPlatforms(PReqs, Plats),
+   checkPlatforms(PReqs, FPlats),
    checkContext(AOp, Args, NId, OpN, Geo, L),
    HwReqs =< HwCaps,
    placeFunctions(AOp, SId, P2, Placement, NewPlacement, Caps, NewCaps).
 
 placeFunctions(AOp, SId, whl(FId, P), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
     func(FId, Args, HwReqs, PReqs, TUnits),
-    node(NId, OpN, HwCaps, Plats, CostPU, Geo),
+    node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
     trusts2(AOp, OpN),
-    checkPlatforms(PReqs, Plats),
+    checkPlatforms(PReqs, FPlats),
     checkContext(AOp, Args, NId, OpN, Geo, L),
     HwReqs =< HwCaps,
     placeFunctions(AOp, SId, P, Placement, NewPlacement, Caps, NewCaps).
@@ -109,7 +111,7 @@ computeCost(Placement, Cost) :- computeCost(Placement, 0, Cost).
 computeCost([],Cost,Cost).
 computeCost([(FId, NId)|Placement], Cost, NewCost) :-
     func(FId, _, _, _, TUnits),
-    node(NId, _, _, _, CostPU, _),
+    node(NId, _, _, _, _, CostPU, _),
     TmpCost is TUnits * CostPU + Cost,
     computeCost(Placement, TmpCost, NewCost).
 
@@ -189,14 +191,14 @@ func(mult,[y,t], 1, java, 10).
 func(div, [z,z], 2, python, 20).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(service1, triggerX, sum, 1, python, [eu]).
-service(service2, triggerY, div, 1, java, [eu]).
+service(service1, triggerX, sum, 1, [ubuntu], [eu]).
+service(service2, triggerY, div, 1, [sql], [eu]).
 
-node(n1, amazon, 4, [python, rust, java, javascript], 0.001, eu).
+node(n1, amazon, 2, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n1).
 firewall(n1).
 
-node(n2, amazon, 5, [python, rust, java, javascript], 0.001, eu).
+node(n2, amazon, 1, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n2).
 firewall(n2).
 
