@@ -138,6 +138,12 @@ checkHw(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, NewFree)|Rest]) :-
 HwReqs =< Free,
 NewFree is Free - HwReqs.
 
+checkHwSeq(HwCaps, _, NId, [], [(NId, HwCaps)]).
+checkHwSeq(HwCaps, HwReqs, NId, [(NId2, R) | Rest], [(NId2, R) | NewFree]) :- 
+NId \== NId2,
+    checkHw(HwCaps, HwReqs, NId, Rest, NewFree).
+checkHwSeq(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, Free)|Rest]) :-
+HwReqs =< Free.
 
 labelF(ann, Args, ts).
 labelF(ann, Args, s) :- findall(X, ts(X, Args), []).
@@ -192,11 +198,11 @@ func(div, [z,z], 2, python, 20).
 service(service1, triggerX, sum, 1, python, [eu]).
 service(service2, triggerY, div, 1, java, [eu]).
 
-node(n1, amazon, 4, [python, rust, java, javascript], 0.001, eu).
+node(n1, amazon, 2, [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n1).
 firewall(n1).
 
-node(n2, amazon, 5, [python, rust, java, javascript], 0.001, eu).
+node(n2, amazon, 1, [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n2).
 firewall(n2).
 
