@@ -40,7 +40,7 @@ placeAllFunctions(_, [], FP, FP, _).
 placeAllFunctions(AOp, [(SId, _)|Placement], FPlacement, NewFPlacement, Caps) :-
     service(SId, _, Prog, _, _, _),
     placeFunctions(AOp, SId, Prog, FPlacement, TmpFPlacement, Caps, NewCaps),
-    placeAllFunctions(AOp, Placement, TmpFPlacement, NewFPlacement, Caps).
+    placeAllFunctions(AOp, Placement, TmpFPlacement, NewFPlacement, NewCaps).
     
 
 % places each function onto a target node, following the orchestrator service code
@@ -63,8 +63,8 @@ placeParFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, N
       HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).   
 
 placeFunctions(AOp, SId, seq(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps),
-      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps),
+      placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps1),
+      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps1),
       append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
 placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
@@ -73,7 +73,7 @@ placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewC
       trusts2(AOp, OpN),
       checkPlatforms(PReqs, FPlats),
       checkContext(AOp, Args, NId, OpN, Geo, L),
-      HwReqs =< HwCaps, checkHw(HwCaps, 0, NId, Caps, NewCaps).  
+      HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).  
 
 placeFunctions(AOp, SId, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
    func(FId, Args, HwReqs, PReqs, TUnits),
@@ -200,11 +200,11 @@ func(div, [z,z], 2, python, 20).
 service(service1, triggerX, sum, 1, [ubuntu], [eu]).
 service(service2, triggerY, div, 1, [sql], [eu]).
 
-node(n1, amazon, 2, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
+node(n1, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n1).
 firewall(n1).
 
-node(n2, amazon, 1, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
+node(n2, amazon, 2, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n2).
 firewall(n2).
 
