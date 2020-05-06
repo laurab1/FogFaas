@@ -68,12 +68,12 @@ placeFunctions(AOp, SId, seq(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
       append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
 placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
-      func(FId, Args, HwReqs, PReqs, TUnits),
-      node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
-      trusts2(AOp, OpN),
-      checkPlatforms(PReqs, FPlats),
-      checkContext(AOp, Args, NId, OpN, Geo, L),
-      HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).  
+    func(FId, Args, HwReqs, PReqs, TUnits),
+    node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
+    trusts2(AOp, OpN),
+    checkPlatforms(PReqs, FPlats),
+    checkContext(AOp, Args, NId, OpN, Geo, L),
+    HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).  
 
 placeFunctions(AOp, SId, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
    func(FId, Args, HwReqs, PReqs, TUnits),
@@ -139,13 +139,6 @@ NId \== NId2,
 checkHw(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, NewFree)|Rest]) :-
 HwReqs =< Free,
 NewFree is Free - HwReqs.
-
-checkHwSeq(HwCaps, _, NId, [], [(NId, HwCaps)]).
-checkHwSeq(HwCaps, HwReqs, NId, [(NId2, R) | Rest], [(NId2, R) | NewFree]) :- 
-NId \== NId2,
-    checkHw(HwCaps, HwReqs, NId, Rest, NewFree).
-checkHwSeq(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, Free)|Rest]) :-
-HwReqs =< Free.
 
 labelF(ann, Args, ts).
 labelF(ann, Args, s) :- findall(X, ts(X, Args), []).
