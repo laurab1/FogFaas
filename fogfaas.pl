@@ -64,7 +64,7 @@ placeParFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, N
 
 placeFunctions(AOp, SId, seq(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
       placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps1),
-      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps1),
+      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps2),
       append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
 placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
@@ -103,8 +103,8 @@ placeFunctions(AOp, SId, whl(FId, P), Placement, [(SId, FId, NId)|NewPlacement],
     placeFunctions(AOp, SId, P, Placement, NewPlacement, Caps, NewCaps).
 
 placeFunctions(AOp, SId, trc(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps),
-      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps),
+      placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps1),
+      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps2),
       append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
 computeCost(Placement, Cost) :- computeCost(Placement, 0, Cost).
@@ -191,7 +191,7 @@ func(div, [z,z], 2, python, 20).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
 service(service1, triggerX, sum, 1, [ubuntu], [eu]).
-service(service2, triggerY, div, 1, [sql], [eu]).
+service(service2, triggerY, seq(div, mult), 1, [sql], [eu]).
 
 node(n1, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n1).
