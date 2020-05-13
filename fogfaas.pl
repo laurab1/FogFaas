@@ -1,6 +1,7 @@
 %%%%%%%%% Working (problog) code %%%%%%%%%
 
 :- consult('app.pl').
+:- consult('infra.pl').
 :- use_module(library(lists)).
 
 %app(AId, [SIds]).

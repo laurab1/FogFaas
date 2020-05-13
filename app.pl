@@ -26,6 +26,8 @@ s(x).
 l(y).
 l(t).
 
+trusts(ann, amazon).
+
 % functions
 
 func(sum, [x,y], 1, rust, 10).
@@ -36,15 +38,6 @@ func(div, [z,z], 2, python, 20).
 service(service1, triggerX, sum, 1, [ubuntu], [eu]).
 service(service2, triggerY, div, 1, [sql], [eu]).
 
-node(n1, amazon, 2, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
-encrypted_storage(n1).
-firewall(n1).
-
-node(n2, amazon, 1, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
-encrypted_storage(n2).
-firewall(n2).
-
-trusts(ann, amazon).
 
 %app(OpA, AId, [SIds]).
 app(app1, [service1, service2]).
