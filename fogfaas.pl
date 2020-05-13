@@ -1,21 +1,6 @@
-%node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo)
-
 %%%%%%%%% Working (problog) code %%%%%%%%%
 
-:- use_module(library(lists)).
-
-%placeServices(AOp, [], Placement, NewPlacement, _, _) :- append(Placement, [], NewPlacement).
-%
-%placeServices(AOp, [SId|Rest], Placement, [NewPlacement, Caps, NewCaps) :-
-%    service(SId, _, Prog, HwReqs, PReqs, Geo),
-%    node(NId, OpN, HwCaps, Plats, CostPU, NodeLoc),
-%    member(NodeLoc, Geo),
-%    member(PReqs, Plats),
-%    trusts2(AOp, OpN),
-%    checkHw(HwCaps, HwReqs, NId, Caps, TmpCaps),
-%    placeFunctionsAux(AOp, Prog, Placement, FunPlacement, TmpCaps, FunCaps),
-%    placeServices(AOp, Rest, [(SId, NId)|FunPlacement], NewPlacement, TmpCaps, NewCaps).
-
+:- consult('app.pl').
 :- use_module(library(lists)).
 
 %app(AId, [SIds]).
@@ -122,15 +107,6 @@ checkContext(AOp, Args, NId, OpN, Geo, L) :- labelN(AOp, NId, OpN, Geo, L),
    labelF(AOp, Args, L).
 
 
-% labels a node with its security context
-labelN(ann, N, OpN, Geo, ts) :- 
-member(Geo, [eu,ch]), 
-firewall(N), 
-member(OpN, [amazon, azure]).
-
-labelN(ann, N, OpN, Geo, s) :- member(Geo, [eu,ch,us]).
-
-labelN(ann, N, OpN, Geo, l) :- member(Geo, [eu,ch,us,vat]).
 
 checkHw(HwCaps, HwReqs, NId, [], [(NId, NewFree)]):- NewFree is HwCaps - HwReqs.
 checkHw(HwCaps, HwReqs, NId, [(NId2, R) | Rest], [(NId2, R) | NewFree]) :- 
@@ -174,37 +150,6 @@ ctx(AOp, whl(FId, P), L) :-
    ctx(AOp, P, L).
 ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
 ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
-
-%%%%%%%%% Working (problog) code %%%%%%%%%
-
-
-ts(z).
-s(x).
-l(y).
-l(t).
-
-% functions
-
-func(sum, [x,y], 1, rust, 10).
-func(mult,[y,t], 1, java, 10).
-func(div, [z,z], 2, python, 20).
-
-%service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(service1, triggerX, sum, 1, [ubuntu], [eu]).
-service(service2, triggerY, seq(div, mult), 1, [sql], [eu]).
-
-node(n1, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
-encrypted_storage(n1).
-firewall(n1).
-
-node(n2, amazon, 2, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
-encrypted_storage(n2).
-firewall(n2).
-
-trusts(ann, amazon).
-
-%app(OpA, AId, [SIds]).
-app(app1, [service1, service2]).
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 
