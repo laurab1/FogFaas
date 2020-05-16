@@ -6,6 +6,7 @@ findRoute(AOp, ReqLatency, Source, Dest, ReqSecurity, [Source|Route]) :-
     link(L, LinkLatency, Source, Step),
     LinkLatency =< ReqLatency,
     labelL(AOp, L, ReqSecurity),
+    Source \== Dest,
     findRoute(AOp, ReqLatency, Step, Dest, ReqSecurity, Route).
     
 
