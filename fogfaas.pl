@@ -1,11 +1,13 @@
 %%%%%%%%% Working (problog) code %%%%%%%%%
-
-:- consult('app.pl').
-:- consult('infra.pl').
 :- use_module(library(lists)).
 
-%app(AId, [SIds]).
-app(app1, [service1, service2]).
+findRoute(AOp, _, Source, Source, _).
+findRoute(AOp, ReqLatency, Source, Dest, ReqSecurity) :- 
+    link(L, LinkLatency, Step, Dest),
+    LinkLatency =< ReqLatency,
+    labelL(AOp, L, ReqSecurity),
+    findRoute(AOp, ReqLatency, Source, Step, ReqSecurity).
+    
 
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
@@ -151,7 +153,3 @@ ctx(AOp, whl(FId, P), L) :-
    ctx(AOp, P, L).
 ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
 ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
-
-%query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
-
-query(placeApp(ann, app1, SP, FP)).
