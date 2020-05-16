@@ -1,12 +1,12 @@
 %%%%%%%%% Working (problog) code %%%%%%%%%
 :- use_module(library(lists)).
 
-findRoute(AOp, _, Source, Source, _).
-findRoute(AOp, ReqLatency, Source, Dest, ReqSecurity) :- 
-    link(L, LinkLatency, Step, Dest),
+findRoute(AOp, _, Source, Source, _, []).
+findRoute(AOp, ReqLatency, Source, Dest, ReqSecurity, [Source|Route]) :- 
+    link(L, LinkLatency, Source, Step),
     LinkLatency =< ReqLatency,
     labelL(AOp, L, ReqSecurity),
-    findRoute(AOp, ReqLatency, Source, Step, ReqSecurity).
+    findRoute(AOp, ReqLatency, Step, Dest, ReqSecurity, Route).
     
 
 placeServices(AOp, [], P, P, C, C).
