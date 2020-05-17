@@ -137,21 +137,78 @@ trusts(X,X).
 trusts2(A,B) :- trusts(A,B).   
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
-%security context
+% security context
 ctx(_, tau, _).
-ctx(AOp, seq(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
+
+ctx(AOp, seq(P1, P2), L) :- 
+                ctx(AOp, P1, _, L), 
+                ctx(AOp, P2, _, L).
+
+%  func(FId, Args, HwReqs, PReqs, TUnits)
+% ctx L = label of program
 ctx(AOp, ife(FId, P1, P2), L) :-
-   func(FId, Args, _, _, _),
-   labelF(AOp, Args, L),
-   ctx(AOp, P1, L),
-   ctx(AOp, P2, L).
+                 func(FId, Args, _, _, _),
+                 labelF(AOp, Args, L),
+                 ctx(AOp, P1,TUnitsT, L), % TUnitsT = time units of then
+                 ctx(AOp, P2,TUnitsE, L), % TUnitsE = time units of else
+                 TUnitsT == TUnitsE.      % TUnitsT must be equal to TUnitsT
+
+
+%ctx = program
+% while( > 0) {} -> terminate
+%  ts ->   ts | s -> l
 ctx(AOp, whl(FId, P), L) :-
-   func(FId, Args, _, _, _),
-   labelF(AOp, Args, L),
-   ctx(AOp, P, L).
-ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
-ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
+                func(FId, Args, _, _, _),
+                labelF(AOp, Args, L),
+                ctx(AOp, P, _, L).
+                
+ctx(AOp, whl(FId, P), L) :-
+                func(FId, Args, _, _, _),
+                labelF(AOp, Args, L),
+                ctx(AOp, P, _, L).         
+
+%% --- search more.
+ctx(AOp, trc(P1, P2), L) :- 
+                ctx(AOp, P1, _, L), 
+                ctx(AOp, P2, _, L).
+
+
+%  func(FId, Args, HwReqs, PReqs, TUnits)
+ctx(AOp, FId,TUnits,L) :- 
+                 func(FId, Args, _, _, TUnits), 
+                 labelF(AOp, Args, L).
+
+checkLabelLevel():-.
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
+%query(placeApp(ann, app1, SP, FP)).
 
-query(placeApp(ann, app1, SP, FP)).
+
+
+% Security Context Test
+ts(z).
+s(x).
+l(y).
+l(t).
+
+
+func(sum, [x,y], 1, rust, 10).
+func(mult,[y,t], 1, java, 10).
+func(div, [z,z], 2, python, 20).
+
+%Sequential test
+ctx(ann,seq(div,mult),L).
+
+% while loo test
+ctx(ann,whl(div, mult), L).
+
+ctx(ann,sum, L).
+
+% try, catch test
+ctx(ann,trc(div,sum), L).
+
+% --------- if-then-else-test ----------
+% insecure
+ctx(ann,ife(div, div, sum),L).
+% secure
+ctx(ann,ife(div, mult, sum),L).
