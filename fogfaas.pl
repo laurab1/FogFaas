@@ -138,47 +138,46 @@ trusts2(A,B) :- trusts(A,B).
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
 % security context
-ctx(_, tau, _).
+ctx(_, tau, _, _).
 
-ctx(AOp, seq(P1, P2), L) :- 
-                ctx(AOp, P1, _, L), 
-                ctx(AOp, P2, _, L).
+ctx(AOp, seq(P1, P2), SeqTUnits,L) :- 
+                ctx(AOp, P1, FstTUnits, L), % FstUnits  = time units of first program
+                ctx(AOp, P2, SndTUnits, L), % SndTUnits = time units of second program.
+                SeqTUnits is FstTUnits + SndTUnits. % SeqTunits = time unit of sequential programs.
 
-%  func(FId, Args, HwReqs, PReqs, TUnits)
-% ctx L = label of program
-ctx(AOp, ife(FId, P1, P2), L) :-
-                 func(FId, Args, _, _, _),
+ctx(AOp, ife(FId, P1, P2), _, L) :-
+                 func(FId, Args, _, _, _), % ?
                  labelF(AOp, Args, L),
                  ctx(AOp, P1,TUnitsT, L), % TUnitsT = time units of then
                  ctx(AOp, P2,TUnitsE, L), % TUnitsE = time units of else
                  TUnitsT == TUnitsE.      % TUnitsT must be equal to TUnitsT
 
-
-%ctx = program
-% while( > 0) {} -> terminate
-%  ts ->   ts | s -> l
-ctx(AOp, whl(FId, P), L) :-
-                func(FId, Args, _, _, _),
+ctx(AOp, whl(FId, P), WhileTUnits, L) :-
+                func(FId, Args, _, _, CTUnits), % CTunits = time unit of guard
                 labelF(AOp, Args, L),
-                ctx(AOp, P, _, L).
-                
-ctx(AOp, whl(FId, P), L) :-
-                func(FId, Args, _, _, _),
-                labelF(AOp, Args, L),
-                ctx(AOp, P, _, L).         
+                ctx(AOp, P, BTunits, L),    % BTunits = time unit of body of while.
+                WhileTUnits is CTUnits + BTunits.  % WhileTUnits = time unite of while
 
+%  ts -> s -> while              
 %% --- search more.
-ctx(AOp, trc(P1, P2), L) :- 
-                ctx(AOp, P1, _, L), 
-                ctx(AOp, P2, _, L).
-
+ctx(AOp, trc(P1, P2), TUnits ,L) :- 
+                ctx(AOp, P1, TTUnits, L),  % ?  how to know which one will work?
+                ctx(AOp, P2, CTUnits, L).  % ?  how to handle program?
 
 %  func(FId, Args, HwReqs, PReqs, TUnits)
-ctx(AOp, FId,TUnits,L) :- 
+ctx(AOp, FId, TUnits,L) :- 
                  func(FId, Args, _, _, TUnits), 
                  labelF(AOp, Args, L).
 
-checkLabelLevel():-.
+
+% for checking label body.
+% labelChecking(conditionLabel, bodyLabel).
+% if condition has higher secret level body cannot 
+% contain lower level secret level
+% while(ts) { s } -> false
+% while(s ? ) { ts } -> true
+% while(l) { ts } -> true
+
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 %query(placeApp(ann, app1, SP, FP)).
@@ -196,19 +195,25 @@ func(sum, [x,y], 1, rust, 10).
 func(mult,[y,t], 1, java, 10).
 func(div, [z,z], 2, python, 20).
 
-%Sequential test
-ctx(ann,seq(div,mult),L).
-
-% while loo test
-ctx(ann,whl(div, mult), L).
-
-ctx(ann,sum, L).
-
-% try, catch test
-ctx(ann,trc(div,sum), L).
-
 % --------- if-then-else-test ----------
+% if else with two program
+% secure 
+query(ctx(ann,ife(div, mult, sum), _,L)).
 % insecure
-ctx(ann,ife(div, div, sum),L).
-% secure
-ctx(ann,ife(div, mult, sum),L).
+query(ctx(ann,ife(div, mult, div), _,L)).
+
+% if with sequential program
+% secure         
+query(ctx(ann,ife(div, seq(sum,sum), div ), _,L)).
+query(ctx(ann,ife(mult, div, seq(sum,sum)), _,L)).
+query(ctx(ann,ife(mult, seq(mult,mult), seq(sum,sum)), _,L)).
+% insecure
+query(ctx(ann,ife(mult, seq(mult,mult),sum), _,L)).
+query(ctx(ann,ife(mult,sum,seq(mult,mult)), _,L)).
+
+% if with while loop
+%secure
+query(ctx(ann,ife(mult, whl(sum,sum),seq(sum,sum)), _,L)).
+query(ctx(ann,ife(mult, whl(sum,sum),div), _,L)).
+%insecure
+query(ctx(ann,ife(mult, whl(sum,sum),sum), _,L)).
