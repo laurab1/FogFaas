@@ -11,7 +11,7 @@ findRoute(AOp, ReqLatency, Old, Source, Dest, ReqSecurity, [Source | Route]) :-
     findRoute(AOp, ReqLatency, Source, Step, Dest, ReqSecurity, Route).
 
 isConnected(Source, Step, L, LinkLatency) :-
-    link(L, LinkLatency, [Source, Step]); isConnected(Step, Source, L, LinkLatency). 
+    link(L, LinkLatency, [Source, Step]); link(L, LinkLatency, [Step, Source]). 
 
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
