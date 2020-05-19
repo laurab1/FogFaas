@@ -1,0 +1,13 @@
+\documentclass[../DraftNotes.tex]{subfiles}
+
+\begin{document}
+
+In order to represent communications between services in a realistic way, we opted for a two level representation:
+\begin{itemize}
+ \item At a lower level, physical links are represented as bidirectional links. This makes a little more
+ complex the findRoute predicate, but also carries an advantage in representing the infrastructure, as
+ we don't need to specify that a link exists in both direction: this is always assumed to hold.
+ \item At a higher level, channels between services are assumed to be monodirectional. This seemed a reasonable choice, as channels are language constructs which allow the user to say "I want service X to send messages to service Y", embedding this information in a service definition.
+\end{itemize}
+
+\end{document}
