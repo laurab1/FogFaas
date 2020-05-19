@@ -1,14 +1,17 @@
 %%%%%%%%% Working (problog) code %%%%%%%%%
 :- use_module(library(lists)).
 
-findRoute(AOp, _, Source, Source, _, []).
-findRoute(AOp, ReqLatency, Source, Dest, ReqSecurity, [Source|Route]) :- 
-    link(L, LinkLatency, Source, Step),
+findRoute(AOp, _, _, Source, Source, _, []).
+findRoute(AOp, ReqLatency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
+    Source \== Dest,
+    isConnected(Source, Step, L, LinkLatency),
+    Old \== Step,
     LinkLatency =< ReqLatency,
     labelL(AOp, L, ReqSecurity),
-    Source \== Dest,
-    findRoute(AOp, ReqLatency, Step, Dest, ReqSecurity, Route).
-    
+    findRoute(AOp, ReqLatency, Source, Step, Dest, ReqSecurity, Route).
+
+isConnected(Source, Step, L, LinkLatency) :-
+    link(L, LinkLatency, [Source, Step]); isConnected(Step, Source, L, LinkLatency). 
 
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
