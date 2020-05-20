@@ -157,8 +157,7 @@ ctx(AOp, whl(FId, P), WhileTUnits, L) :-
                 labelF(AOp, Args, L),
                 ctx(AOp, P, BTunits, L),    % BTunits = time unit of body of while.
                 WhileTUnits is CTUnits + BTunits.  % WhileTUnits = time unite of while
-
-%  ts -> s -> while              
+          
 %% --- search more.
 ctx(AOp, trc(P1, P2), TUnits ,L) :- 
                 ctx(AOp, P1, TTUnits, L),  % ?  how to know which one will work?
