@@ -1,17 +1,24 @@
 :- use_module(library(lists)).
 
 l(x).
-l(t).
-s_eu(y).
-s_us(z).
+s(y, eu).
+s(z, us).
+ts(v, eu).
+ts(w, us).
 
-labelF(bob, Args, l).
+labelF(bob, Args, ts_eu) :- findall(X, isUs(X, Args), []).
+labelF(bob, Args, ts_us) :- findall(X, isEu(X, Args), []).
+isUs(X, Args) :- member(X, Args),(s(X, us); ts(X, us)).
+isEu(X, Args) :- member(X, Args),(s(X, eu); ts(X, eu)).
 
-labelF(bob, Args, s_eu) :- findall(X,notEu(X, Args), []).
-notEu(X, Args) :- member(X, Args),(s_us(X);l(X)).
+labelF(bob, Args, l) :- findall(X, notSec(X, Args), []).
+notSec(X, Args) :- member(X, Args),(isUs(X, Args); isEu(X, Args)).
 
-labelF(bob, Args, s_us) :- findall(X,notUs(X, Args), []).
-notUs(X, Args) :- member(X, Args),(s_eu(X);l(X)).
+labelF(bob, Args, s_eu) :- findall(X, euNotTS(X, Args), []).
+euNotTS(X, Args) :- member(X, Args),(isUs(X, Args); ts(X, eu)).
+
+labelF(bob, Args, s_us) :- findall(X, usNotTS(X, Args), []).
+usNotTS(X, Args) :- member(X, Args),(isEu(X, Args); ts(X, us)).
 
 func(sum, [x,y], 1, rust, 10).
 func(mult,[y,t], 1, java, 10).
@@ -37,5 +44,5 @@ trusts(bob, amazon).
 %app(OpA, AId, [SIds]).
 app(bob, app1, [service1, service2]).
 
-query(labelF(bob, [y], L)).
+query(labelF(bob, [x, y], L)).
 %query(placeFunctions(bob, ife(mult, sum, par(div, mult)), R, C)).
