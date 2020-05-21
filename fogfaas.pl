@@ -154,8 +154,7 @@ ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
 ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
-
 %query(placeApp(ann, app1, SP, FP)).
 
-l(v).
+
 query(ctx(ann, read(file2, v), L)).
