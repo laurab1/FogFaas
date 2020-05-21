@@ -1,14 +1,22 @@
 %%%%%%%%% Working (problog) code %%%%%%%%%
 :- use_module(library(lists)).
 
-findRoute(AOp, _, _, Source, Source, _, []).
-findRoute(AOp, ReqLatency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
+findRoute(AOp, OldLatency, OldLatency, Old, Source, Source, _, []).
+findRoute(AOp, OldLatency, Latency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
     Source \== Dest,
     isConnected(Source, Step, L, LinkLatency),
     Old \== Step,
-    LinkLatency =< ReqLatency,
+    OldLatency =< LinkLatency,
     labelL(AOp, L, ReqSecurity),
-    findRoute(AOp, ReqLatency, Source, Step, Dest, ReqSecurity, Route).
+    findRoute(AOp, LinkLatency, Latency, Source, Step, Dest, ReqSecurity, Route).
+
+findRoute(AOp, OldLatency, Latency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
+    Source \== Dest,
+    isConnected(Source, Step, L, LinkLatency),
+    Old \== Step,
+    LinkLatency =< OldLatency,
+    labelL(AOp, L, ReqSecurity),
+    findRoute(AOp, OldLatency, Latency, Source, Step, Dest, ReqSecurity, Route).
 
 isConnected(Source, Step, L, LinkLatency) :-
     link(L, LinkLatency, [Source, Step]); link(L, LinkLatency, [Step, Source]). 

@@ -14,14 +14,14 @@ labelF(bob, Args, ts_us) :- findall(X, isEu(X, Args), []).
 isUs(X, Args) :- member(X, Args),(s(X, us); ts(X, us)).
 isEu(X, Args) :- member(X, Args),(s(X, eu); ts(X, eu)).
 
-labelF(bob, Args, l) :- findall(X, notSec(X, Args), []).
-notSec(X, Args) :- member(X, Args),(isUs(X, Args); isEu(X, Args)).
+labelF(bob, Args, l) :- findall(X, isSec(X, Args), []).
+isSec(X, Args) :- member(X, Args),(isUs(X, Args); isEu(X, Args)).
 
-labelF(bob, Args, s_eu) :- findall(X, euNotTS(X, Args), []).
-euNotTS(X, Args) :- member(X, Args),(isUs(X, Args); ts(X, eu)).
+labelF(bob, Args, s_eu) :- findall(X, euOrTS(X, Args), []).
+euOrTS(X, Args) :- member(X, Args),(isUs(X, Args); ts(X, eu)).
 
-labelF(bob, Args, s_us) :- findall(X, usNotTS(X, Args), []).
-usNotTS(X, Args) :- member(X, Args),(isEu(X, Args); ts(X, us)).
+labelF(bob, Args, s_us) :- findall(X, usOrTS(X, Args), []).
+usOrTS(X, Args) :- member(X, Args),(isEu(X, Args); ts(X, us)).
 
 labelN(bob, N, OpN, Geo, ts_eu) :- 
                             member(Geo, [eu]), 

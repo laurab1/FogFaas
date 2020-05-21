@@ -19,12 +19,12 @@ notPublic(X, Args) :-
 ts(X, Args) :- 
                     member(X, Args), ts(X).
 
-labelL(ann, L, s) :- 
+labelL(ann, L, Lbl) :- 
                     link(L, _, [N1, N2]),
                     node(N1, OpN, _, _, _, _, Geo),
                     node(N2, OpN, _, _, _, _, Geo),
-                    labelN(ann, N1, OpN, Geo, s),
-                    labelN(ann, N2, OpN, Geo, s).
+                    labelN(ann, N1, OpN, Geo, Lbl),
+                    labelN(ann, N2, OpN, Geo, Lbl).
 
 %%%%%%%%%%%%%%%% App %%%%%%%%%%%%%%%%
 
