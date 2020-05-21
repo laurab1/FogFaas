@@ -7,7 +7,7 @@ placeFunctions(AOp, SId, read(File, Var), Placement, [(SId, read(File, Var), NId
     1 =< HwCaps, checkHw(HwCaps, 1, NId, Caps, NewCaps). 
 
 
-placeFunctions(AOp, SId, write(Var, File), Placement, [(SId, read(File, Var), NId)|Placement], Caps, NewCaps) :-
+placeFunctions(AOp, SId, write(Var, File), Placement, [(SId, write(Var, File), NId)|Placement], Caps, NewCaps) :-
     node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
     trusts2(AOp, OpN),
     labelN(AOp, NId, OpN, Geo, L),
