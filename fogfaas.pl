@@ -2,6 +2,7 @@
 
 :- consult('app.pl').
 :- consult('infra.pl').
+:- consult('tau.pl').
 :- use_module(library(lists)).
 
 %app(AId, [SIds]).
@@ -154,4 +155,7 @@ ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 
-query(placeApp(ann, app1, SP, FP)).
+%query(placeApp(ann, app1, SP, FP)).
+
+l(v).
+query(ctx(ann, read(file2, v), L)).
