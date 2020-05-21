@@ -145,42 +145,32 @@ ctx(AOp, seq(P1, P2), SeqTUnits,L) :-
                 ctx(AOp, P2, SndTUnits, L), % SndTUnits = time units of second program.
                 SeqTUnits is FstTUnits + SndTUnits. % SeqTunits = time unit of sequential programs.
 
-ctx(AOp, ife(FId, P1, P2), _, L) :-
-                 func(FId, Args, _, _, _), % ?
-                 labelF(AOp, Args, L),
-                 ctx(AOp, P1,TUnitsT, L), % TUnitsT = time units of then
-                 ctx(AOp, P2,TUnitsE, L), % TUnitsE = time units of else
-                 TUnitsT == TUnitsE.      % TUnitsT must be equal to TUnitsT
+ctx(AOp, ife(FId, P1, P2), TUnits, L) :-
+                func(FId, Args, _, _, _), % ?
+                labelF(AOp, Args, L),
+                ctx(AOp, P1,TUnitsT, L), % TUnitsT = time units of then
+                ctx(AOp, P2,TUnitsE, L), % TUnitsE = time units of else
+                TUnitsT == TUnitsE,      % TUnitsT must be equal to TUnitsT
+                TUnits is TUnitsT.       % TUnits = time units of if then else
 
-ctx(AOp, whl(FId, P), WhileTUnits, L) :-
+ctx(AOp, whl(FId, P), TUnitsW, L) :-
                 func(FId, Args, _, _, CTUnits), % CTunits = time unit of guard
                 labelF(AOp, Args, L),
                 ctx(AOp, P, BTunits, L),    % BTunits = time unit of body of while.
-                WhileTUnits is CTUnits + BTunits.  % WhileTUnits = time unite of while
+                TUnitsW is CTUnits + BTunits.  % TUnitsW = time unite of while
           
-%% --- search more.
-ctx(AOp, trc(P1, P2), TUnits ,L) :- 
-                ctx(AOp, P1, TTUnits, L),  % ?  how to know which one will work?
-                ctx(AOp, P2, CTUnits, L).  % ?  how to handle program?
+ctx(AOp, trc(P1, P2), TUnitsTRC ,L) :- 
+                ctx(AOp, P1, TTUnits, L),  %  TTUnits = time units of try
+                ctx(AOp, P2, CTUnits, L),  %  CTUnits = time units of catch
+                TTUnits == CTUnits,        %  The logic same with if-then-else
+                TUnitsTRC is TTUnits.      %  TUnitsTRC = time units of try catch
 
-%  func(FId, Args, HwReqs, PReqs, TUnits)
 ctx(AOp, FId, TUnits,L) :- 
-                 func(FId, Args, _, _, TUnits), 
-                 labelF(AOp, Args, L).
-
-
-% for checking label body.
-% labelChecking(conditionLabel, bodyLabel).
-% if condition has higher secret level body cannot 
-% contain lower level secret level
-% while(ts) { s } -> false
-% while(s ? ) { ts } -> true
-% while(l) { ts } -> true
-
+                func(FId, Args, _, _, TUnits), % TUnits = Computational time for FId
+                labelF(AOp, Args, L). 
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 %query(placeApp(ann, app1, SP, FP)).
-
 
 
 % Security Context Test
@@ -188,7 +178,6 @@ ts(z).
 s(x).
 l(y).
 l(t).
-
 
 func(sum, [x,y], 1, rust, 10).
 func(mult,[y,t], 1, java, 10).
@@ -216,3 +205,11 @@ query(ctx(ann,ife(mult, whl(sum,sum),seq(sum,sum)), _,L)).
 query(ctx(ann,ife(mult, whl(sum,sum),div), _,L)).
 %insecure
 query(ctx(ann,ife(mult, whl(sum,sum),sum), _,L)).
+
+% if with trc 
+% secure
+query(ctx(ann,ife(mult,trc(sum,sum),sum),T,L)).
+query(ctx(ann,ife(mult,trc(div,div),seq(sum,sum)),T,L)).
+% insecure
+query(ctx(ann,ife(mult,trc(div,sum),sum),T,L)).
+query(ctx(ann,ife(mult,trc(div,sum),seq(sum,sum)),T,L)).
