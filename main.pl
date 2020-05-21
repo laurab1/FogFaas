@@ -4,7 +4,7 @@
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 
-%query(placeApp(ann, app1, SP, FP)).
+query(placeApp(ann, app1, SP, FP)).
 
 %query(labelC(ann, c1, s)).
 

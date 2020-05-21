@@ -123,13 +123,6 @@ checkHw(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, NewFree)|Rest]) :-
 HwReqs =< Free,
 NewFree is Free - HwReqs.
 
-labelF(ann, Args, ts).
-labelF(ann, Args, s) :- findall(X, ts(X, Args), []).
-labelF(ann, Args, l) :- findall(X, notPublic(X, Args), []).
-notPublic(X, Args) :-  member(X, Args),(ts(X);s(X)). 
-ts(X, Args) :- member(X, Args), ts(X).
-
-
 % labels a service composing multiple functions
 labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L).
 
