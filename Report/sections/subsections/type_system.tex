@@ -2,6 +2,21 @@
 
 \begin{document}
 
+In order to strengthen our type system to prevent information flow leaks from our 
+In order to strengthen our type system to prevent information flow leaks from our programs. We considered language-based information flow security paper, which particularly focusing on work that uses static program analysis to enforce information-flow policies. Extension on type system is based on covert channels definitions that is considered in the paper. We consider implementing implicit flows, by extending if-then-else.
+\newline
+\\
+The attacker can find out which part of the control flow is executed by checking execution time. We change type system to enforce both part of control flow to have same execution time therefore the attacker cannot make an observation to distinguish flow.
+\newline
+\\
+In representation of type system, we added time units variable to predicator, therefore we can have time that is need for checking. For the if-then-else we checked time unit of then and else part to see if they are equal. In both part of control flow there can be other programs like, sequential, while loop, or try catch there for the time calculation for that program is need.  
+\begin{itemize}
+	\item For a single program we just update time unit label with programs time units.
+	\item For checking sequential program, we updated time of program with sum of the time units of two sequential program.
+	\item For checking try catch we assumed it is like a control flow therefore first we checked if both try and catch have same time units then update time units label of program with one of them.  
+	\item TODO!! <search about time unit of while>
+\end{itemize}
+
 
 
 \end{document}
