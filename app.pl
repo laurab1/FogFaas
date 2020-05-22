@@ -40,11 +40,13 @@ trusts(ann, amazon).
 func(sum, [x,y], 1, rust, 10).
 func(mult,[y,t], 1, java, 10).
 func(div, [z,z], 2, python, 20).
+func(true, [], 1, python, 5).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
 service(service1, triggerX, sum, 1, [ubuntu], [eu]).
 service(service2, triggerY, div, 1, [sql], [eu]).
+service(service3, triggerX, send([x], service1), 1, [ubuntu], [eu]).
 
 
 %app(OpA, AId, [SIds]).
-app(app1, [service1, service2]).
+app(app1, [service1, service2, service3]).

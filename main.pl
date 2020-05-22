@@ -2,9 +2,11 @@
 :- consult('infra.pl').
 :- consult('fogfaas.pl').
 
-%query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
+%query(placeFunctions(ann, (service1, n1), [(service1, n1),(service2,n4)], send([x], service2), [], R, [], C)).
 
-%query(placeApp(ann, app1, SP, FP)).
+query(placeApp(ann, app1, SP, FP)).
+
+%query(findNode(service2, N, [(service2, n2)])).
 
 %query(labelC(ann, c1, s)).
 
