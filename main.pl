@@ -4,7 +4,7 @@
 
 %query(placeFunctions(ann, (service1, n1), [(service1, n1),(service2,n4)], send([x], service2), [], R, [], C)).
 
-%query(placeApp(ann, app1, SP, FP)).
+query(placeApp(ann, app1, SP, FP)).
 
 %query(findNode(service2, N, [(service2, n2)])).
 
@@ -14,4 +14,4 @@
 
 %query(ctx(ann, seq(sum, send([x], service1, 1)), L, [])).
 
-query(ctx(ann, send([x], service1, 1), L, [x], Env)).
+%query(ctx(ann, ife(sum, sum, send([x], service1, 1)), L, [x], Env)).

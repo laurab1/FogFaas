@@ -45,10 +45,10 @@ func(true, [], 1, python, 5).
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
 service(service1, triggerX, sum, 1, [ubuntu], [eu]).
 service(service2, triggerY, div, 1, [sql], [eu]).
-service(service3, triggerX, send([x], service1, 1), 1, [ubuntu], [eu]).
+service(service3, triggerX, seq(sum, send([x], service1, 1)), 1, [ubuntu], [eu]).
 
-responseTime(service1, 0.5).
-%responseTime(service1, 2).
+0.7::responseTime(service1, 0.5).
+0.3::responseTime(service1, 2).
 
 0.7::responseTime(service3, 0.5).
 0.3::responseTime(service3, 2).

@@ -4,6 +4,7 @@
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
     service(SId, _, Prog, HwReqs, PReqs, Geo),
+    ctx(AOp, Prog, L, [], Env),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
@@ -52,7 +53,7 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, N
     trusts2(AOp, OpN),
     checkPlatforms(PReqs, FPlats),
     checkContext(AOp, Args, NId, OpN, Geo, L),
-    HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).  
+    HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
    func(FId, Args, HwReqs, PReqs, TUnits),
@@ -169,13 +170,13 @@ ctx(AOp, seq(P1, P2), L, Env, NewEnv) :-
 ctx(AOp, ife(FId, P1, P2), L, Env, NewEnv) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   append(Env, Args, Env1),
+   union(Env, Args, Env1),
    ctx(AOp, P1, L, Env1, Env2),
    ctx(AOp, P2, L, Env2, NewEnv).
 ctx(AOp, whl(FId, P), L, Env, NewEnv) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   append(Env, Args, TmpEnv),
+   union(Env, Args, TmpEnv),
    ctx(AOp, P, L, TmpEnv, NewEnv).
 ctx(AOp, trc(P1, P2), L, Env, NewEnv) :- 
     ctx(AOp, P1, L, Env, TmpEnv), 
@@ -183,16 +184,16 @@ ctx(AOp, trc(P1, P2), L, Env, NewEnv) :-
 ctx(AOp, FId, L, Env, NewEnv) :- 
     func(FId, Args, _, _, _),
     labelF(AOp, Args, L),
-    append(Env, Args, NewEnv).
+    union(Env, Args, NewEnv).
 ctx(AOp, send(Args, Service, Timeout), L, Env, Env) :-
     responseTime(Service, Time),
     Time =< Timeout,
     subset(Args, Env),
     labelF(AOp, Args, L),
     service(Service, _, Prog, _, _, _),
-    ctx(AOp, Prog, L2, [], ServEnv),
+    ctx(AOp, Prog, L2, Args, ServEnv),
     leq2(AOp, L, L2).
-ctx(AOp, send(Args, Service, Timeout), L, Env) :-
+ctx(AOp, send(Args, Service, Timeout), L, Env, Env) :-
     responseTime(Service, Time),
     Timeout =< Time,
     subset(Args, Env),
