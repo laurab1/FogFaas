@@ -14,4 +14,4 @@
 
 %query(ctx(ann, seq(sum, send([x], service1, 1)), L, [])).
 
-query(ctx(ann, send([x], service1, 1), L, [x])).
+query(ctx(ann, send([x], service1, 1), L, [x], Env)).

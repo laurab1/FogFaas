@@ -152,38 +152,46 @@ trusts(X,X).
 trusts2(A,B) :- trusts(A,B).   
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
+% better labelling needed
+leq(AOp, X, X).               
+leq2(AOp, A, B) :- leq(AOp, A, B).   
+leq2(AOp, A, B) :- leq(AOp, A, C), leq2(AOp, C, B), A \== B.
+
+% default lattice l <= s <= ts
+leq(ann, l, s).
+leq(ann, s, ts).
+
 %security context
-ctx(_, tau, _ , _).
-ctx(AOp, seq(P1, P2), L, Env) :- 
-    ctx(AOp, P1, L, Env1), 
-    ctx(AOp, P2, L, Env2),
-    append(Env1, Env2, Env).
-ctx(AOp, ife(FId, P1, P2), L, Env) :-
+ctx(_, tau, _ , _, _).
+ctx(AOp, seq(P1, P2), L, Env, NewEnv) :- 
+    ctx(AOp, P1, L, Env, TmpEnv), 
+    ctx(AOp, P2, L, TmpEnv, NewEnv).
+ctx(AOp, ife(FId, P1, P2), L, Env, NewEnv) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   ctx(AOp, P1, L, Env1),
-   ctx(AOp, P2, L, Env2),
-   append(Env1, Env2, TmpEnv),
-   append(TmpEnv, Args, Env).
-ctx(AOp, whl(FId, P), L, Env) :-
+   append(Env, Args, Env1),
+   ctx(AOp, P1, L, Env1, Env2),
+   ctx(AOp, P2, L, Env2, NewEnv).
+ctx(AOp, whl(FId, P), L, Env, NewEnv) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   ctx(AOp, P, L, TmpEnv),
-   append(TmpEnv, Args, Env).
-ctx(AOp, trc(P1, P2), L) :- 
-    ctx(AOp, P1, L, Env1),
-    ctx(AOp, P2, L, Env2),
-    append(Env1, Env2, Env).
-ctx(AOp, FId, L, Args) :- 
+   append(Env, Args, TmpEnv),
+   ctx(AOp, P, L, TmpEnv, NewEnv).
+ctx(AOp, trc(P1, P2), L, Env, NewEnv) :- 
+    ctx(AOp, P1, L, Env, TmpEnv), 
+    ctx(AOp, P2, L, TmpEnv, NewEnv).
+ctx(AOp, FId, L, Env, NewEnv) :- 
     func(FId, Args, _, _, _),
-    labelF(AOp, Args, L).
-ctx(AOp, send(Args, Service, Timeout), L, Env) :-
+    labelF(AOp, Args, L),
+    append(Env, Args, NewEnv).
+ctx(AOp, send(Args, Service, Timeout), L, Env, Env) :-
     responseTime(Service, Time),
     Time =< Timeout,
     subset(Args, Env),
     labelF(AOp, Args, L),
-    service(Service, _, Prog, _, _, _).
-    ctx(AOp, Prog, L, Args).
+    service(Service, _, Prog, _, _, _),
+    ctx(AOp, Prog, L2, [], ServEnv),
+    leq2(AOp, L, L2).
 ctx(AOp, send(Args, Service, Timeout), L, Env) :-
     responseTime(Service, Time),
     Timeout =< Time,
