@@ -1,26 +1,6 @@
 %%%%%%%%% Working (problog) code %%%%%%%%%
 :- use_module(library(lists)).
 
-findRoute(AOp, OldLatency, OldLatency, Old, Source, Source, _, []).
-findRoute(AOp, OldLatency, Latency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
-    Source \== Dest,
-    isConnected(Source, Step, L, LinkLatency),
-    Old \== Step,
-    OldLatency =< LinkLatency,
-    labelL(AOp, L, ReqSecurity),
-    findRoute(AOp, LinkLatency, Latency, Source, Step, Dest, ReqSecurity, Route).
-
-findRoute(AOp, OldLatency, Latency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
-    Source \== Dest,
-    isConnected(Source, Step, L, LinkLatency),
-    Old \== Step,
-    LinkLatency =< OldLatency,
-    labelL(AOp, L, ReqSecurity),
-    findRoute(AOp, OldLatency, Latency, Source, Step, Dest, ReqSecurity, Route).
-
-isConnected(Source, Step, L, LinkLatency) :-
-    link(L, LinkLatency, [Source, Step]); link(L, LinkLatency, [Step, Source]). 
-
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
     service(SId, _, Prog, HwReqs, PReqs, Geo),
@@ -106,7 +86,7 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, trc(P1, P2), Placement, NewPl
     placeFunctions(AOp, (SId, Node), ServicePlacement, P2, Placement, PlacementTmp2, Caps, NewCaps2),
     append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
-placeFunctions(AOp, (SId, Node), ServicePlacement, send(Args, Service), Placement, Placement, Caps, Caps) :-
+placeFunctions(AOp, (SId, Node), ServicePlacement, send(Args, Service, _), Placement, Placement, Caps, Caps) :-
     findNode(Service, TargetNode, ServicePlacement),
     labelF(AOp, Args, ReqSecurity),
     findRoute(AOp, 0, Latency, Node, Node, TargetNode, ReqSecurity, [Source | Route]).
@@ -115,6 +95,26 @@ findNode(Dest, Node, [(Dest, Node) | Rest]).
 findNode(Dest, Node, [(Service, Node2) | Rest]) :- 
     Service \== Dest,
     findNode(Dest, Node, Rest).
+
+findRoute(AOp, OldLatency, OldLatency, Old, Source, Source, _, []).
+findRoute(AOp, OldLatency, Latency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
+    Source \== Dest,
+    isConnected(Source, Step, L, LinkLatency),
+    Old \== Step,
+    OldLatency =< LinkLatency,
+    labelL(AOp, L, ReqSecurity),
+    findRoute(AOp, LinkLatency, Latency, Source, Step, Dest, ReqSecurity, Route).
+
+findRoute(AOp, OldLatency, Latency, Old, Source, Dest, ReqSecurity, [Source | Route]) :- 
+    Source \== Dest,
+    isConnected(Source, Step, L, LinkLatency),
+    Old \== Step,
+    LinkLatency =< OldLatency,
+    labelL(AOp, L, ReqSecurity),
+    findRoute(AOp, OldLatency, Latency, Source, Step, Dest, ReqSecurity, Route).
+
+isConnected(Source, Step, L, LinkLatency) :-
+    link(L, LinkLatency, [Source, Step]); link(L, LinkLatency, [Step, Source]). 
 
 computeCost(Placement, Cost) :- computeCost(Placement, 0, Cost).
 computeCost([],Cost,Cost).
@@ -166,3 +166,12 @@ ctx(AOp, whl(FId, P), L) :-
    ctx(AOp, P, L).
 ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
 ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
+ctx(AOp, send(Args, Service, Timeout), L) :-
+    responseTime(Service, Time),
+    Time =< Timeout,
+    labelF(AOp, Args, L),
+    labelS(AOp, Service, L).
+ctx(AOp, send(Args, Service, Timeout), L) :-
+    responseTime(Service, Time),
+    Timeout =< Time,
+    labelF(AOp, Args, L).
