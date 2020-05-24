@@ -4,6 +4,7 @@
 :- consult('infra.pl').
 :- consult('tau.pl').
 :- use_module(library(lists)).
+:- use_module(library(assert)).
 
 %app(AId, [SIds]).
 app(app1, [service1, service2]).
@@ -157,4 +158,20 @@ ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
 %query(placeApp(ann, app1, SP, FP)).
 
 
-query(ctx(ann, read(file2, v), L)).
+% file2 is labeled as "l"
+
+% % I can read l info into s var
+% s(var1).
+% query(ctx(ann, read(file2, var1), L)).
+
+% % I cannot write ts info to a l file
+% ts(var2).
+% query(ctx(ann, write(var2, file2), L)).
+
+l(var2).
+labelResource(ann, file2, s).
+query(ctx(ann, write(var2, file2), L)).
+
+
+% program example
+% seq(read(file, x), foo(x))
