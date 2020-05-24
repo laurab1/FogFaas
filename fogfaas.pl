@@ -144,11 +144,14 @@ ctx(_, tau, _, _, _).
 ctx(AOp, seq(P1, P2), L, History, NewHistory) :- 
     ctx(AOp, P1, L, History, TmpHistory), 
     ctx(AOp, P2, L, TmpHistory, NewHistory).
-ctx(AOp, ife(FId, P1, P2), L, History, NewHistory) :-
+ctx(AOp, ife(FId, P1, _), L, History, NewHistory) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   ctx(AOp, P1, L), % ??
-   ctx(AOp, P2, L). % ??
+   ctx(AOp, P1, L, History, NewHistory).
+ctx(AOp, ife(FId, _, P2), L, History, NewHistory) :-
+    func(FId, Args, _, _, _),
+    labelF(AOp, Args, L),
+    ctx(AOp, P2, L, History, NewHistory).
 ctx(AOp, whl(FId, P), L, History, NewHistory) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
