@@ -14,7 +14,7 @@ In representation of type system, we added time units variable to predicator, th
 	\item For a single program we just update time unit label with programs time units.
 	\item For checking sequential program, we updated time of program with sum of the time units of two sequential program.
 	\item For checking try catch we assumed it is like a control flow therefore first we checked if both try and catch have same time units then update time units label of program with one of them.  
-	\item TODO!! <search about time unit of while>
+	\item For checking while loop we assumed total time unit of body of loop is calculated, therefore, we just sum time units of guard and body as a total time units.
 \end{itemize}
 
 
