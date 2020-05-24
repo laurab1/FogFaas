@@ -140,7 +140,7 @@ HwReqs =< Free,
 NewFree is Free - HwReqs.
 
 % labels a service composing multiple functions
-labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L).
+labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L, []).
 
 % checks if node label supports function label
 supports(AOp,NId,l) :- labelN(AOp,NId,_).
@@ -153,25 +153,39 @@ trusts2(A,B) :- trusts(A,B).
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
 %security context
-ctx(_, tau, _).
-ctx(AOp, seq(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
-ctx(AOp, ife(FId, P1, P2), L) :-
+ctx(_, tau, _ , _).
+ctx(AOp, seq(P1, P2), L, Env) :- 
+    ctx(AOp, P1, L, Env1), 
+    ctx(AOp, P2, L, Env2),
+    append(Env1, Env2, Env).
+ctx(AOp, ife(FId, P1, P2), L, Env) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   ctx(AOp, P1, L),
-   ctx(AOp, P2, L).
-ctx(AOp, whl(FId, P), L) :-
+   ctx(AOp, P1, L, Env1),
+   ctx(AOp, P2, L, Env2),
+   append(Env1, Env2, TmpEnv),
+   append(TmpEnv, Args, Env).
+ctx(AOp, whl(FId, P), L, Env) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   ctx(AOp, P, L).
-ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
-ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
-ctx(AOp, send(Args, Service, Timeout), L) :-
+   ctx(AOp, P, L, TmpEnv),
+   append(TmpEnv, Args, Env).
+ctx(AOp, trc(P1, P2), L) :- 
+    ctx(AOp, P1, L, Env1),
+    ctx(AOp, P2, L, Env2),
+    append(Env1, Env2, Env).
+ctx(AOp, FId, L, Args) :- 
+    func(FId, Args, _, _, _),
+    labelF(AOp, Args, L).
+ctx(AOp, send(Args, Service, Timeout), L, Env) :-
     responseTime(Service, Time),
     Time =< Timeout,
+    subset(Args, Env),
     labelF(AOp, Args, L),
-    labelS(AOp, Service, L).
-ctx(AOp, send(Args, Service, Timeout), L) :-
+    service(Service, _, Prog, _, _, _).
+    ctx(AOp, Prog, L, Args).
+ctx(AOp, send(Args, Service, Timeout), L, Env) :-
     responseTime(Service, Time),
     Timeout =< Time,
+    subset(Args, Env),
     labelF(AOp, Args, L).

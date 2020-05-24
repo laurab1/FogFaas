@@ -43,12 +43,12 @@ func(div, [z,z], 2, python, 20).
 func(true, [], 1, python, 5).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(service1, triggerX, send([z], service3, 1), 1, [ubuntu], [eu]).
+service(service1, triggerX, seq(div,send([z], service3, 1)), 1, [ubuntu], [eu]).
 service(service2, triggerY, div, 1, [sql], [eu]).
 service(service3, triggerX, send([x], service1, 1), 1, [ubuntu], [eu]).
 
-0.7::responseTime(service1, 0.5).
-0.3::responseTime(service1, 2).
+responseTime(service1, 0.5).
+%0.3::responseTime(service1, 2).
 
 0.7::responseTime(service3, 0.5).
 0.3::responseTime(service3, 2).
