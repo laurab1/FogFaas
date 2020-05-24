@@ -141,6 +141,7 @@ HwReqs =< Free,
 NewFree is Free - HwReqs.
 
 % labels a service composing multiple functions
+% NOT NEEDED
 labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L, []).
 
 % checks if node label supports function label
