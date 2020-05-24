@@ -172,8 +172,14 @@ ctx(AOp, FId, TUnits,L) :-
                 labelF(AOp, Args, L). 
 
 % I assumed here ther will be only l 
-guardCheck(X):- not(X = ts),  
-                not(X = s).
+
+
+guardCheck(X):- not(X = ts),
+                not(X = s),
+                not(X = s_eu),
+                not(X = s_us).
+
+
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 %query(placeApp(ann, app1, SP, FP)).
