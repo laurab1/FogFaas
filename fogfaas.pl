@@ -156,9 +156,11 @@ ctx(AOp, ife(FId, P1, P2), TUnits, L) :-
 ctx(AOp, whl(FId, P), TUnitsW, L) :-
                 func(FId, Args, _, _, CTUnits), % CTunits = time unit of guard
                 labelF(AOp, Args, L),
+                guardCheck(L),
                 ctx(AOp, P, BTunits, L),    % BTunits = time unit of body of while.
                 TUnitsW is CTUnits + BTunits.  % TUnitsW = time unite of while
-          
+                
+
 ctx(AOp, trc(P1, P2), TUnitsTRC ,L) :- 
                 ctx(AOp, P1, TTUnits, L),  %  TTUnits = time units of try
                 ctx(AOp, P2, CTUnits, L),  %  CTUnits = time units of catch
@@ -169,9 +171,12 @@ ctx(AOp, FId, TUnits,L) :-
                 func(FId, Args, _, _, TUnits), % TUnits = Computational time for FId
                 labelF(AOp, Args, L). 
 
+% I assumed here ther will be only l 
+guardCheck(X):- not(X = ts),  
+                not(X = s).
+
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 %query(placeApp(ann, app1, SP, FP)).
-
 
 % Security Context Test
 ts(z).
@@ -195,6 +200,7 @@ query(ctx(ann,ife(div, mult, div), _,L)).
 query(ctx(ann,ife(div, seq(sum,sum), div ), _,L)).
 query(ctx(ann,ife(mult, div, seq(sum,sum)), _,L)).
 query(ctx(ann,ife(mult, seq(mult,mult), seq(sum,sum)), _,L)).
+
 % insecure
 query(ctx(ann,ife(mult, seq(mult,mult),sum), _,L)).
 query(ctx(ann,ife(mult,sum,seq(mult,mult)), _,L)).
@@ -210,6 +216,15 @@ query(ctx(ann,ife(mult, whl(sum,sum),sum), _,L)).
 % secure
 query(ctx(ann,ife(mult,trc(sum,sum),sum),T,L)).
 query(ctx(ann,ife(mult,trc(div,div),seq(sum,sum)),T,L)).
+
 % insecure
 query(ctx(ann,ife(mult,trc(div,sum),sum),T,L)).
 query(ctx(ann,ife(mult,trc(div,sum),seq(sum,sum)),T,L)).
+
+
+% While test
+% secure
+query(ctx(ann,whl(mult,mult),T,L)).
+% insecure
+query(ctx(ann,whl(div,sum),T,L)).
+query(ctx(ann,whl(sum,sum),T,L)).
