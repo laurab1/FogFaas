@@ -140,19 +140,23 @@ trusts2(A,B) :- trusts(A,B).
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
 %security context
-ctx(_, tau, _).
-ctx(AOp, seq(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
-ctx(AOp, ife(FId, P1, P2), L) :-
+ctx(_, tau, _, _, _).
+ctx(AOp, seq(P1, P2), L, History, NewHistory) :- 
+    ctx(AOp, P1, L, History, TmpHistory), 
+    ctx(AOp, P2, L, TmpHistory, NewHistory).
+ctx(AOp, ife(FId, P1, P2), L, History, NewHistory) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   ctx(AOp, P1, L),
-   ctx(AOp, P2, L).
-ctx(AOp, whl(FId, P), L) :-
+   ctx(AOp, P1, L), % ??
+   ctx(AOp, P2, L). % ??
+ctx(AOp, whl(FId, P), L, History, NewHistory) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
-   ctx(AOp, P, L).
-ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
-ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
+   ctx(AOp, P, L, History, NewHistory).
+ctx(AOp, trc(P1, P2), L, History, NewHistory) :- 
+    ctx(AOp, P1, L, History, TmpHistory), 
+    ctx(AOp, P2, L, TmpHistory, NewHistory).
+ctx(AOp, FId, L, History, History) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 %query(placeApp(ann, app1, SP, FP)).
