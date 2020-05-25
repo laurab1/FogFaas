@@ -2,6 +2,7 @@
 
 :- consult('app.pl').
 :- consult('infra.pl').
+:- consult('trigger.pl').
 :- use_module(library(lists)).
 
 %app(AId, [SIds]).
@@ -9,7 +10,8 @@ app(app1, [service1, service2]).
 
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
-    service(SId, _, Prog, HwReqs, PReqs, Geo),
+    service(SId, Trig, Prog, HwReqs, PReqs, Geo),
+    trigger(Trig, Prog, ETime),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
@@ -17,12 +19,13 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
     checkHw(HwCaps, HwReqs, NId, Caps, TmpCaps),
     placeServices(AOp, Rest, Placement, NewPlacement, TmpCaps, NewCaps).
 
-placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
+placeApp(AOp, AId, ServicePlacement, TriggerPlacement, FunctionPlacement):-
     app(AId, Services),
     placeServices(AOp, Services, [], ServicePlacement, [], Caps),
+    placeTriggers(AOp, Triggers, [], TriggerPlacement),
     placeAllFunctions(AOp, ServicePlacement, [], FunctionPlacement, Caps).
 
-placeAllFunctions(_, [], FP, FP, _).
+placeAllFunctions(_, [], TP, FP, FP, _).
 placeAllFunctions(AOp, [(SId, _)|Placement], FPlacement, NewFPlacement, Caps) :-
     service(SId, _, Prog, _, _, _),
     placeFunctions(AOp, SId, Prog, FPlacement, TmpFPlacement, Caps, NewCaps),
@@ -37,21 +40,21 @@ placeAllFunctions(AOp, [(SId, _)|Placement], FPlacement, NewFPlacement, Caps) :-
 placeFunctions(_, _, tau, _, _, [], _).
 
 placeFunctions(AOp, SId, par(F1, F2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeParFunctions(AOp, SId, F1, Placement, PlacementTmp, Caps, CapsTmp),
-      placeParFunctions(AOp, SId, F2, PlacementTmp, NewPlacement, CapsTmp, NewCaps).
+    placeParFunctions(AOp, SId, F1, Placement, PlacementTmp, Caps, CapsTmp),
+    placeParFunctions(AOp, SId, F2, PlacementTmp, NewPlacement, CapsTmp, NewCaps).
 
 placeParFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
-      func(FId, Args, HwReqs, PReqs, TUnits),
-      node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
-      trusts2(AOp, OpN),
-      checkPlatforms(PReqs, FPlats),
-      checkContext(AOp, Args, NId, OpN, Geo, L),
-      HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).   
+    func(FId, Args, HwReqs, PReqs, TUnits),
+    node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
+    trusts2(AOp, OpN),
+    checkPlatforms(PReqs, FPlats),
+    checkContext(AOp, Args, NId, OpN, Geo, L),
+    HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).   
 
 placeFunctions(AOp, SId, seq(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps1),
-      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps2),
-      append(PlacementTmp1, PlacementTmp2, NewPlacement).
+    placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps1),
+    placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps2),
+    append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
 placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
     func(FId, Args, HwReqs, PReqs, TUnits),
@@ -62,22 +65,22 @@ placeFunctions(AOp, SId, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewC
     HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).  
 
 placeFunctions(AOp, SId, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
-   func(FId, Args, HwReqs, PReqs, TUnits),
-   node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
-   trusts2(AOp, OpN),
-   checkPlatforms(PReqs, FPlats),
-   checkContext(AOp, Args, NId, OpN, Geo, L),
-   HwReqs =< HwCaps,
-   placeFunctions(AOp, SId, P1, Placement, NewPlacement, Caps, NewCaps).
+    func(FId, Args, HwReqs, PReqs, TUnits),
+    node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
+    trusts2(AOp, OpN),
+    checkPlatforms(PReqs, FPlats),
+    checkContext(AOp, Args, NId, OpN, Geo, L),
+    HwReqs =< HwCaps,
+    placeFunctions(AOp, SId, P1, Placement, NewPlacement, Caps, NewCaps).
 
 placeFunctions(AOp, SId, ife(FId, P1, P2), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
-   func(FId, Args, HwReqs, PReqs, TUnits),
-   node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
-   trusts2(AOp, OpN),
-   checkPlatforms(PReqs, FPlats),
-   checkContext(AOp, Args, NId, OpN, Geo, L),
-   HwReqs =< HwCaps,
-   placeFunctions(AOp, SId, P2, Placement, NewPlacement, Caps, NewCaps).
+    func(FId, Args, HwReqs, PReqs, TUnits),
+    node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
+    trusts2(AOp, OpN),
+    checkPlatforms(PReqs, FPlats),
+    checkContext(AOp, Args, NId, OpN, Geo, L),
+    HwReqs =< HwCaps,
+    placeFunctions(AOp, SId, P2, Placement, NewPlacement, Caps, NewCaps).
 
 placeFunctions(AOp, SId, whl(FId, P), Placement, [(SId, FId, NId)|NewPlacement], Caps, NewCaps) :-
     func(FId, Args, HwReqs, PReqs, TUnits),
@@ -89,9 +92,9 @@ placeFunctions(AOp, SId, whl(FId, P), Placement, [(SId, FId, NId)|NewPlacement],
     placeFunctions(AOp, SId, P, Placement, NewPlacement, Caps, NewCaps).
 
 placeFunctions(AOp, SId, trc(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps1),
-      placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps2),
-      append(PlacementTmp1, PlacementTmp2, NewPlacement).
+    placeFunctions(AOp, SId, P1, Placement, PlacementTmp1, Caps, NewCaps1),
+    placeFunctions(AOp, SId, P2, Placement, PlacementTmp2, Caps, NewCaps2),
+    append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
 computeCost(Placement, Cost) :- computeCost(Placement, 0, Cost).
 computeCost([],Cost,Cost).
@@ -105,7 +108,7 @@ computeCost([(FId, NId)|Placement], Cost, NewCost) :-
 checkPlatforms(PReqs, Plats) :- member(PReqs, Plats).
 
 checkContext(AOp, Args, NId, OpN, Geo, L) :- labelN(AOp, NId, OpN, Geo, L), 
-   labelF(AOp, Args, L).
+    labelF(AOp, Args, L).
 
 
 
