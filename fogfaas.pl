@@ -140,21 +140,113 @@ trusts(X,X).
 trusts2(A,B) :- trusts(A,B).   
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
-%security context
-ctx(_, tau, _).
-ctx(AOp, seq(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
-ctx(AOp, ife(FId, P1, P2), L) :-
-    func(FId, Args, _, _, _),
-    labelF(AOp, Args, L),
-    ctx(AOp, P1, L),
-    ctx(AOp, P2, L).
-ctx(AOp, whl(FId, P), L) :-
-    func(FId, Args, _, _, _),
-    labelF(AOp, Args, L),
-    ctx(AOp, P, L).
-ctx(AOp, trc(P1, P2), L) :- ctx(AOp, P1, L), ctx(AOp, P2, L).
-ctx(AOp, FId, L) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
+% security context
+ctx(_, tau, _, _).
+
+ctx(AOp, seq(P1, P2), SeqTUnits,L) :- 
+                ctx(AOp, P1, FstTUnits, L), % FstUnits  = time units of first program
+                ctx(AOp, P2, SndTUnits, L), % SndTUnits = time units of second program.
+                SeqTUnits is FstTUnits + SndTUnits. % SeqTunits = time unit of sequential programs.
+
+ctx(AOp, ife(FId, P1, P2), TUnits, L) :-
+                func(FId, Args, _, _, _), % ?
+                labelF(AOp, Args, L),
+                ctx(AOp, P1,TUnitsT, L), % TUnitsT = time units of then
+                ctx(AOp, P2,TUnitsE, L), % TUnitsE = time units of else
+                TUnitsT == TUnitsE,      % TUnitsT must be equal to TUnitsT
+                TUnits is TUnitsT.       % TUnits = time units of if then else
+
+ctx(AOp, whl(FId, P), TUnitsW, L) :-
+                func(FId, Args, _, _, CTUnits), % CTunits = time unit of guard
+                labelF(AOp, Args, L),
+                guardCheck(L),
+                ctx(AOp, P, BTunits, L),    % BTunits = time unit of body of while.
+                TUnitsW is CTUnits + BTunits.  % TUnitsW = time unite of while
+                
+
+ctx(AOp, trc(P1, P2), TUnitsTRC ,L) :- 
+                ctx(AOp, P1, TTUnits, L),  %  TTUnits = time units of try
+                ctx(AOp, P2, CTUnits, L),  %  CTUnits = time units of catch
+                TTUnits == CTUnits,        %  The logic same with if-then-else
+                TUnitsTRC is TTUnits.      %  TUnitsTRC = time units of try catch
+
+ctx(AOp, FId, TUnits,L) :- 
+                func(FId, Args, _, _, TUnits), % TUnits = Computational time for FId
+                labelF(AOp, Args, L). 
+
+% those are the Label that are not allowed to use in guard
+guardCheck(X):- not(X = ts),    
+                not(X = s),
+                not(X = ts_eu),
+                not(X = ts_us),
+                not(X = s_eu),
+                not(X = s_us).
+
+%       ts
+%       |
+%       s
+%       |
+%       l
+
+%   ts_eu   ts_us
+%     |       |
+%   s_eu    s_us
+%      \    /
+%        l
+
+% l is the public label for two latices there fore
+% this guard will work for both latices
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
+%query(placeApp(ann, app1, SP, FP)).
 
-query(placeApp(ann, app1, SP, FP)).
+% Security Context Test
+ts(z).
+s(x).
+l(y).
+l(t).
+
+func(sum, [x,y], 1, rust, 10).
+func(mult,[y,t], 1, java, 10).
+func(div, [z,z], 2, python, 20).
+
+% --------- if-then-else-test ----------
+% if else with two program
+% secure 
+query(ctx(ann,ife(div, mult, sum), _,L)).
+% insecure
+query(ctx(ann,ife(div, mult, div), _,L)).
+
+% if with sequential program
+% secure         
+query(ctx(ann,ife(div, seq(sum,sum), div ), _,L)).
+query(ctx(ann,ife(mult, div, seq(sum,sum)), _,L)).
+query(ctx(ann,ife(mult, seq(mult,mult), seq(sum,sum)), _,L)).
+
+% insecure
+query(ctx(ann,ife(mult, seq(mult,mult),sum), _,L)).
+query(ctx(ann,ife(mult,sum,seq(mult,mult)), _,L)).
+
+% if with while loop
+%secure
+query(ctx(ann,ife(mult, whl(sum,sum),seq(sum,sum)), _,L)).
+query(ctx(ann,ife(mult, whl(sum,sum),div), _,L)).
+%insecure
+query(ctx(ann,ife(mult, whl(sum,sum),sum), _,L)).
+
+% if with trc 
+% secure
+query(ctx(ann,ife(mult,trc(sum,sum),sum),T,L)).
+query(ctx(ann,ife(mult,trc(div,div),seq(sum,sum)),T,L)).
+
+% insecure
+query(ctx(ann,ife(mult,trc(div,sum),sum),T,L)).
+query(ctx(ann,ife(mult,trc(div,sum),seq(sum,sum)),T,L)).
+
+
+% While test
+% secure
+query(ctx(ann,whl(mult,mult),T,L)).
+% insecure
+query(ctx(ann,whl(div,sum),T,L)).
+query(ctx(ann,whl(sum,sum),T,L)).
