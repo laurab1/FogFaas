@@ -1,29 +1,18 @@
-%%% % TRIGGER PLACEMENT
-%%% trigger(TId, FId, EventTime) :- 
-%%%     checkCondition(EventTime, TUnits),
-%%%     func(FId, Args, HwReqs, PReqs, TUnits).
 
 
-%%% % CHECK CONDITION
-%%% checkCondition(EventTime, TUnits) :- 
-%%%     EventTime <= TUnits
-
-
-
-trigger(triggerX, sum, 10).
-trigger(triggerY, mult, 20).
-
-
+trigger(triggerX, sum, rule1).
+trigger(triggerY, div, rule2).
+trigger(triggerY, sum, rule3).
 
 placeTriggers(AOp, [], T, T).
-placeTriggers(AOp, [TId|Rest], Placement, [(TId, NId)|NewPlacement]) :-
-    trigger(TId, Prog, ETime),
+placeTriggers(AOp, [TId|Rest], Placement, [(TId, NId)|NewPlacement], Caps, NewCaps) :-
+    trigger(TId, Prog, Rule),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
     trusts2(AOp, OpN),
     checkHw(HwCaps, HwReqs, NId, Caps, TmpCaps),
-    placeTriggers(AOp, Rest, Placement, NewPlacement).
+    placeTriggers(AOp, Rest, Placement, NewPlacement, TmpCaps, NewCaps).
 
 
 
