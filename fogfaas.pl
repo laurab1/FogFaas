@@ -119,6 +119,15 @@ checkHw(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, NewFree)|Rest]) :-
 HwReqs =< Free,
 NewFree is Free - HwReqs.
 
+% lattice ordering
+leq(AOp, X, X).               
+leq2(AOp, A, B) :- leq(AOp, A, B).   
+leq2(AOp, A, B) :- leq(AOp, A, C), leq2(AOp, C, B), A \== B.
+
+% default lattice l <= s <= ts
+leq(ann, l, s).
+leq(ann, s, ts).
+
 labelF(ann, Args, ts).
 labelF(ann, Args, s) :- findall(X, ts(X, Args), []).
 labelF(ann, Args, l) :- findall(X, notPublic(X, Args), []).
@@ -160,25 +169,3 @@ ctx(AOp, trc(P1, P2), L, History, NewHistory) :-
     ctx(AOp, P1, L, History, TmpHistory), 
     ctx(AOp, P2, L, TmpHistory, NewHistory).
 ctx(AOp, FId, L, History, History) :- func(FId, Args, _, _, _), labelF(AOp, Args, L).
-
-%query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
-%query(placeApp(ann, app1, SP, FP)).
-
-
-% file2 is labeled as "l"
-
-% % I can read l info into s var
-% s(var1).
-% query(ctx(ann, read(file2, var1), L)).
-
-% % I cannot write ts info to a l file
-% ts(var2).
-% query(ctx(ann, write(var2, file2), L)).
-
-l(var2).
-labelResource(ann, file2, s).
-query(ctx(ann, write(var2, file2), L)).
-
-
-% program example
-% seq(read(file, x), foo(x))
