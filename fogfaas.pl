@@ -19,7 +19,7 @@ placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
     placeServices(AOp, Services, [], ServicePlacement, [], Caps),
     placeAllFunctions(AOp, ServicePlacement, ServicePlacement, [], FunctionPlacement, Caps).
 
-placeAllFunctions(_, [], ServicePlacement, FP, FP, _).
+placeAllFunctions(_, [], _, FP, FP, _).
 placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFPlacement, Caps) :-
     service(SId, _, Prog, _, _, _),
     placeFunctions(AOp, (SId, Node), GlobPlacement, Prog, FPlacement, TmpFPlacement, Caps, NewCaps),
@@ -30,11 +30,11 @@ placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFP
 %      placeFunctionsAux(AOp, Prog, [], Placement, [], NewCaps),
 %      computeCost(Placement, Cost).
 
-placeFunctions(_, _, _, tau, _, _, [], _).
+placeFunctions(_, _, _, tau, _, [], _, _).
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, par(F1, F2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeParFunctions(AOp, (SId, Node), _, F1, Placement, PlacementTmp, Caps, CapsTmp),
-      placeParFunctions(AOp, (SId, Node), _, F2, PlacementTmp, NewPlacement, CapsTmp, NewCaps).
+      placeParFunctions(AOp, (SId, Node), ServicePlacement, F1, Placement, PlacementTmp, Caps, CapsTmp),
+      placeParFunctions(AOp, (SId, Node), ServicePlacement, F2, PlacementTmp, NewPlacement, CapsTmp, NewCaps).
 
 placeParFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
       func(FId, Args, HwReqs, PReqs, TUnits),
@@ -49,7 +49,7 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, seq(P1, P2), Placement, NewPl
       placeFunctions(AOp, (SId, Node), ServicePlacement, P2, Placement, PlacementTmp2, Caps, NewCaps),
       append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
-placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
+placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, Caps) :-
     func(FId, Args, HwReqs, PReqs, TUnits),
     node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
     trusts2(AOp, OpN),
@@ -202,6 +202,13 @@ trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
 %security context
 ctx(_, tau, _ , _, _, _, _).
+ctx(AOp, par(F1, F2), L, Env, NewEnv, History, History) :- 
+    func(F1, Args1, _, _, _),
+    func(F2, Args2, _, _, _),
+    labelF(AOp, Args1, L),
+    labelF(AOp, Args2, L),
+    union(Env, Args1, TmpEnv),
+    union(TmpEnv, Args2, NewEnv).
 ctx(AOp, seq(P1, P2), L, Env, NewEnv, History, NewHistory) :- 
     ctx(AOp, P1, L, Env, TmpEnv, History, TmpHistory), 
     ctx(AOp, P2, L, TmpEnv, NewEnv, TmpHistory, NewHistory).

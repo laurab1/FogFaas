@@ -2,11 +2,13 @@
 :- consult('infra.pl').
 :- consult('fogfaas.pl').
 
-%query(placeFunctions(ann, (service1, n1), [(service1, n1),(service2,n4)], send([x], service2), [], R, [], C)).
+query(placeFunctions(default, (service1, n1), [(service1, n1),(service2,n2)], par(sum, mult), [], R, [], C)).
+
+%query(placeServices(default, [service1, service2], [], P, [], C)).
 
 query(placeApp(default, app1, SP, FP)).
 
-%query(findNode(service2, N, [(service2, n2)])).
+%query(placeAllFunctions(default, [(service1, n1),(service2,n2)], [(service1, n1),(service2,n2)], [], NewFPlacement, NewCaps)).
 
 %query(findRoute(ann, 0, L, n1, n1, n3, s, R)).
 
@@ -14,4 +16,4 @@ query(placeApp(default, app1, SP, FP)).
 
 %query(ctx(ann, seq(sum, send([x], service1, 1)), L, [])).
 
-%query(ctx(ann, ife(sum, sum, send([x], service1, 1)), L, [x], Env)).
+%query(ctx(default, ife(sum, sum, send([x], service1, 1)), L, [x], Env)).
