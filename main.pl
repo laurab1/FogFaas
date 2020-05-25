@@ -2,9 +2,9 @@
 :- consult('infra.pl').
 :- consult('fogfaas.pl').
 
-query(placeFunctions(default, (service1, n1), [(service1, n1),(service2,n2)], sum, [], R, [], C)).
+query(placeFunctions(default, (service1, n1), [(service1, n1),(service2,n2)], par(sum, mult), [], R, [], C)).
 
-query(placeServices(default, [service1, service2], [], P, [], C)).
+%query(placeServices(default, [service1, service2], [], P, [], C)).
 
 query(placeApp(default, app1, SP, FP)).
 
