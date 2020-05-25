@@ -1,10 +1,12 @@
 %%%%%%%%% Working (problog) code %%%%%%%%%
+
 :- use_module(library(lists)).
+:- use_module(library(assert)).
 
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
     service(SId, _, Prog, HwReqs, PReqs, Geo),
-    ctx(AOp, Prog, L, [], Env),
+    ctx(AOp, Prog, L, [], Env, [], History),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
@@ -91,6 +93,28 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, send(Args, Service, _), Place
     findNode(Service, TargetNode, ServicePlacement),
     labelF(AOp, Args, ReqSecurity),
     findRoute(AOp, 0, Latency, Node, Node, TargetNode, ReqSecurity, [Source | Route]).
+    
+placeFunctions(AOp, (SId, Node), ServicePlacement, read(Res, CD, COI, Var), Placement, Placement, Caps, Caps).
+placeFunctions(AOp, (SId, Node), ServicePlacement, write(Var, Res, CD, COI), Placement, Placement, Caps, Caps).
+placeFunctions(AOp, (SId, Node), ServicePlacement, new(Res, CD, COI, LRes), Placement, Placement, Caps, Caps).
+
+% ACCESS CONTROL
+
+canRead(Res, CD, COI, []).
+canRead(Res, CD, COI, [(O, OCD, OCOI)|Rest]) :- 
+    readCondition(O, OCD, OCOI, Res, CD, COI), 
+    canRead(Res, CD, COI, Rest).
+
+readCondition(O, OCD, OCOI, Res, CD, COI) :- 
+    O \== Res, (OCOI \== COI; OCD == CD).
+
+canWrite(Res, CD, COI, []).
+canWrite(Res, CD, COI, [(O, OCD, OCOI)|Rest]) :- 
+    writeCondition(O, OCD, OCOI, Res, CD, COI), 
+    canWrite(Res, CD, COI, Rest).
+
+writeCondition(O, OCD, OCOI, Res, CD, COI) :-
+    readCondition(O, OCD, OCOI, Res, CD, COI), OCD == CD.
 
 findNode(Dest, Node, [(Dest, Node) | Rest]).
 findNode(Dest, Node, [(Service, Node2) | Rest]) :- 
@@ -140,9 +164,24 @@ checkHw(_, HwReqs, NId, [(NId, Free) | Rest], [(NId, NewFree)|Rest]) :-
 HwReqs =< Free,
 NewFree is Free - HwReqs.
 
+% lattice ordering
+leq(AOp, X, X).               
+leq2(AOp, A, B) :- leq(AOp, A, B).   
+leq2(AOp, A, B) :- leq(AOp, A, C), leq2(AOp, C, B), A \== B.
+
+% default lattice l <= s <= ts
+leq(default, l, s).
+leq(default, s, ts).
+
+labelF(default, Args, ts).
+labelF(default, rgs, s) :- findall(X, ts(X, Args), []).
+labelF(default, Args, l) :- findall(X, notPublic(X, Args), []).
+notPublic(X, Args) :-  member(X, Args),(ts(X);s(X)). 
+ts(X, Args) :- member(X, Args), ts(X).
+
 % labels a service composing multiple functions
 % NOT NEEDED
-labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L, []).
+%labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L, []).
 
 labelL(AOp, L, Lbl) :- 
                     link(L, _, [N1, N2]),
@@ -161,44 +200,59 @@ trusts(X,X).
 trusts2(A,B) :- trusts(A,B).   
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
-% better labelling needed
-leq(AOp, X, X).               
-leq2(AOp, A, B) :- leq(AOp, A, B).   
-leq2(AOp, A, B) :- leq(AOp, A, C), leq2(AOp, C, B), A \== B.
-
 %security context
-ctx(_, tau, _ , _, _).
-ctx(AOp, seq(P1, P2), L, Env, NewEnv) :- 
-    ctx(AOp, P1, L, Env, TmpEnv), 
-    ctx(AOp, P2, L, TmpEnv, NewEnv).
-ctx(AOp, ife(FId, P1, P2), L, Env, NewEnv) :-
-   func(FId, Args, _, _, _),
-   labelF(AOp, Args, L),
-   union(Env, Args, Env1),
-   ctx(AOp, P1, L, Env1, Env2),
-   ctx(AOp, P2, L, Env2, NewEnv).
-ctx(AOp, whl(FId, P), L, Env, NewEnv) :-
+ctx(_, tau, _ , _, _, _, _).
+ctx(AOp, seq(P1, P2), L, Env, NewEnv, History, NewHistory) :- 
+    ctx(AOp, P1, L, Env, TmpEnv, History, TmpHistory), 
+    ctx(AOp, P2, L, TmpEnv, NewEnv, TmpHistory, NewHistory).
+ctx(AOp, ife(FId, P1, _), L, Env, NewEnv, History, NewHistory) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
    union(Env, Args, TmpEnv),
-   ctx(AOp, P, L, TmpEnv, NewEnv).
-ctx(AOp, trc(P1, P2), L, Env, NewEnv) :- 
-    ctx(AOp, P1, L, Env, TmpEnv), 
-    ctx(AOp, P2, L, TmpEnv, NewEnv).
-ctx(AOp, FId, L, Env, NewEnv) :- 
+   ctx(AOp, P1, L, TmpEnv, NewEnv, History, NewHistory).
+ctx(AOp, ife(FId, _, P2), L, Env, NewEnv, History, NewHistory) :-
+   func(FId, Args, _, _, _),
+   labelF(AOp, Args, L),
+   union(Env, Args, TmpEnv),
+   ctx(AOp, P2, L, TmpEnv, NewEnv, History, NewHistory).
+ctx(AOp, whl(FId, P), L, Env, NewEnv, History, NewHistory) :-
+   func(FId, Args, _, _, _),
+   labelF(AOp, Args, L),
+   union(Env, Args, TmpEnv),
+   ctx(AOp, P, L, TmpEnv, NewEnv, History, NewHistory).
+ctx(AOp, trc(P1, P2), L, Env, NewEnv, History, NewHistory) :- 
+    ctx(AOp, P1, L, Env, TmpEnv, History, TmpHistory), 
+    ctx(AOp, P2, L, TmpEnv, NewEnv, TmpHistory, NewHistory).
+ctx(AOp, FId, L, Env, NewEnv, History, History) :- 
     func(FId, Args, _, _, _),
     labelF(AOp, Args, L),
     union(Env, Args, NewEnv).
-ctx(AOp, send(Args, Service, Timeout), L, Env, Env) :-
+ctx(AOp, send(Args, Service, Timeout), L, Env, Env, History, History) :-
     responseTime(Service, Time),
     Time =< Timeout,
     subset(Args, Env),
     labelF(AOp, Args, L),
     service(Service, _, Prog, _, _, _),
-    ctx(AOp, Prog, L2, Args, ServEnv),
+    ctx(AOp, Prog, L2, Args, ServEnv, [], ServHistory),
     leq2(AOp, L, L2).
-ctx(AOp, send(Args, Service, Timeout), L, Env, Env) :-
+ctx(AOp, send(Args, Service, Timeout), L, Env, Env, History, History) :-
     responseTime(Service, Time),
     Timeout =< Time,
     subset(Args, Env),
     labelF(AOp, Args, L).
+ctx(AOp, read(Res, CD, COI, Var), LVar, Env, Env, History, [(Res, CD, COI)|History]) :-
+    labelResource(Res, CD, COI, LRes),
+    canRead(Res, CD, COI, History),
+    leq2(AOp, LRes, LVar),
+    call(LVar, Var),
+    assertz(labelResource(Res, CD, COI, LVar)).
+% LVar <= LRes
+ctx(AOp, write(Var, Res, CD, COI), LRes, Env, Env, History, History) :-
+    labelResource(Res, CD, COI, LRes),
+    canWrite(Res, CD, COI, History),
+    leq2(AOp, LVar, LRes),
+    call(LVar, Var),
+    NewSecLevel =.. [LRes, Var],
+    assertz(NewSecLevel).
+ctx(AOp, new(Res, CD, COI, LRes), LRes, Env, Env, History, History) :-
+    assertz(labelResource(Res, CD, COI, LRes)).
