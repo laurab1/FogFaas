@@ -16,10 +16,10 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
 
 placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
     app(AId, Services),
-    placeServices(AOp, Services, [], ServicePlacement, [], Caps),
+    placeServices(AOp, Services, [], ServicePlacement, [], Caps).
     placeAllFunctions(AOp, ServicePlacement, ServicePlacement, [], FunctionPlacement, Caps).
 
-placeAllFunctions(_, [], ServicePlacement, FP, FP, _).
+placeAllFunctions(_, [], _, FP, FP, _).
 placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFPlacement, Caps) :-
     service(SId, _, Prog, _, _, _),
     placeFunctions(AOp, (SId, Node), GlobPlacement, Prog, FPlacement, TmpFPlacement, Caps, NewCaps),
@@ -30,7 +30,7 @@ placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFP
 %      placeFunctionsAux(AOp, Prog, [], Placement, [], NewCaps),
 %      computeCost(Placement, Cost).
 
-placeFunctions(_, _, _, tau, _, _, [], _).
+placeFunctions(_, _, _, tau, _, [], _, _).
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, par(F1, F2), Placement, NewPlacement, Caps, NewCaps) :-
       placeParFunctions(AOp, (SId, Node), _, F1, Placement, PlacementTmp, Caps, CapsTmp),
@@ -49,7 +49,7 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, seq(P1, P2), Placement, NewPl
       placeFunctions(AOp, (SId, Node), ServicePlacement, P2, Placement, PlacementTmp2, Caps, NewCaps2),
       append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
-placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
+placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, Caps) :-
     func(FId, Args, HwReqs, PReqs, TUnits),
     node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
     trusts2(AOp, OpN),

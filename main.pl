@@ -2,13 +2,13 @@
 :- consult('infra.pl').
 :- consult('fogfaas.pl').
 
-query(placeFunctions(default, (service1, n1), [(service1, n1),(service2,n2)], seq(mult,sum), [], R, [], C)).
+query(placeFunctions(default, (service1, n1), [(service1, n1),(service2,n2)], sum, [], R, [], C)).
 
 query(placeServices(default, [service1, service2], [], P, [], C)).
 
 query(placeApp(default, app1, SP, FP)).
 
-%query(findNode(service2, N, [(service2, n2)])).
+%query(placeAllFunctions(default, [(service1, n1),(service2,n2)], [(service1, n1),(service2,n2)], [], NewFPlacement, NewCaps)).
 
 %query(findRoute(ann, 0, L, n1, n1, n3, s, R)).
 

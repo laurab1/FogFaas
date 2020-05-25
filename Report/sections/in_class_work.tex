@@ -44,8 +44,52 @@ In this case, we just state that
 In order to perform some security checks, in particular for communication between services and access to resources, a \emph{leq} predicate is also required, which mirrors the order relation induced by \emph{labelF}. The main example lattice and the resulting \emph{leq} predicate are provided as default.
 \smallskip
 As a preliminary example, consider two services and three nodes, defined as follows:
+
 \begin{verbatim}
-	
+	service(service1, triggerX, seq(mult, sum), 1, [ubuntu], [eu]).
+	service(service2, triggerY, div, 1, [sql], [eu]).
 \end{verbatim}
+
+where mult is a low function, sum is a secret function and div is a top secret function.
+Here we require that the hosting node is located in Europe and provides Ubuntu for service1 and SQL for service2. Furthermore, we have an indicator of required capabilites, quantified as 1. \\
+The infrastructure is as follows:
+
+\begin{verbatim}
+	node(n1, amazon, 3, [ubuntu, sql], 
+	[python, rust, java, javascript], 0.001, eu).
+	encrypted_storage(n1).
+	firewall(n1).
+
+	node(n2, amazon, 2, [ubuntu, sql], 
+	[python, rust, java, javascript], 0.001, eu).
+	encrypted_storage(n2).
+	firewall(n2).
+
+	node(n3, amazon, 1, [ubuntu, sql], 
+	[python, rust, java, javascript], 0.001, us).
+	encrypted_storage(n3).
+\end{verbatim}
+
+where 3, 2 and 1 are a representation of the capabilities offered by the nodes. The labelling of nodes is defined through a \emph{labelN} predicate: 
+
+\begin{verbatim}
+	labelN(default, N, OpN, Geo, ts) :- 
+                            member(Geo, [eu,ch]), 
+                            firewall(N), 
+                            member(OpN, [amazon, azure]).
+	labelN(default, N, OpN, Geo, s) :- 
+                            member(Geo, [eu,ch,us]).
+	labelN(default, N, OpN, Geo, l) :- 
+                            member(Geo, [eu,ch,us,vat]).
+
+\end{verbatim}
+
+By running the query
+
+\begin{verbatim}
+query(placeApp(default, app1, SP, FP)).
+\end{verbatim}
+
+We get a suitable deployment: indeed, no service is placed on n3, as both the services are required to be deployed in Europe, while nodes n1 and n2 are eligible to host them as the met the top secret security requirements.
 
 \end{document}
