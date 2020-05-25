@@ -1,24 +1,13 @@
 %%%%%%%%%%%%%%%% User defined predicates %%%%%%%%%%%%%%%%
 % labels a node with its security context
-labelN(ann, N, OpN, Geo, ts) :- 
+labelN(default, N, OpN, Geo, ts) :- 
                             member(Geo, [eu,ch]), 
                             firewall(N), 
                             member(OpN, [amazon, azure]).
-labelN(ann, N, OpN, Geo, s) :- 
+labelN(default, N, OpN, Geo, s) :- 
                             member(Geo, [eu,ch,us]).
-labelN(ann, N, OpN, Geo, l) :- 
+labelN(default, N, OpN, Geo, l) :- 
                             member(Geo, [eu,ch,us,vat]).
-
-labelF(ann, Args, ts).
-labelF(ann, Args, s) :- 
-                    findall(X, ts(X, Args), []).
-labelF(ann, Args, l) :- 
-                    findall(X, notPublic(X, Args), []).
-notPublic(X, Args) :-  
-                    member(X, Args),(ts(X);s(X)). 
-ts(X, Args) :- 
-                    member(X, Args), ts(X).
-
 
 
 %%%%%%%%%%%%%%%% App %%%%%%%%%%%%%%%%
