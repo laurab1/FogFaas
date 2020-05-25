@@ -144,6 +144,13 @@ NewFree is Free - HwReqs.
 % NOT NEEDED
 labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L, []).
 
+labelL(AOp, L, Lbl) :- 
+                    link(L, _, [N1, N2]),
+                    node(N1, OpN, _, _, _, _, Geo),
+                    node(N2, OpN, _, _, _, _, Geo),
+                    labelN(AOp, N1, OpN, Geo, Lbl),
+                    labelN(AOp, N2, OpN, Geo, Lbl).
+
 % checks if node label supports function label
 supports(AOp,NId,l) :- labelN(AOp,NId,_).
 supports(AOp,NId,s) :- labelN(AOp,NId,L), L \== l.
@@ -158,10 +165,6 @@ trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 leq(AOp, X, X).               
 leq2(AOp, A, B) :- leq(AOp, A, B).   
 leq2(AOp, A, B) :- leq(AOp, A, C), leq2(AOp, C, B), A \== B.
-
-% default lattice l <= s <= ts
-leq(ann, l, s).
-leq(ann, s, ts).
 
 %security context
 ctx(_, tau, _ , _, _).

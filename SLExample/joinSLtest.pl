@@ -23,6 +23,12 @@ euOrTS(X, Args) :- member(X, Args),(isUs(X, Args); ts(X, eu)).
 labelF(bob, Args, s_us) :- findall(X, usOrTS(X, Args), []).
 usOrTS(X, Args) :- member(X, Args),(isEu(X, Args); ts(X, us)).
 
+% default lattice l <= s <= ts
+leq(bob, l, s_eu).
+leq(bob, l, s_us).
+leq(bob, s_eu, ts_eu).
+leq(bob, s_us, ts_us).
+
 labelN(bob, N, OpN, Geo, ts_eu) :- 
                             member(Geo, [eu]), 
                             firewall(N), 

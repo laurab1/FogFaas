@@ -19,12 +19,7 @@ notPublic(X, Args) :-
 ts(X, Args) :- 
                     member(X, Args), ts(X).
 
-labelL(ann, L, Lbl) :- 
-                    link(L, _, [N1, N2]),
-                    node(N1, OpN, _, _, _, _, Geo),
-                    node(N2, OpN, _, _, _, _, Geo),
-                    labelN(ann, N1, OpN, Geo, Lbl),
-                    labelN(ann, N2, OpN, Geo, Lbl).
+
 
 %%%%%%%%%%%%%%%% App %%%%%%%%%%%%%%%%
 
@@ -52,6 +47,10 @@ service(service3, triggerX, seq(sum, send([x], service1, 1)), 1, [ubuntu], [eu])
 
 0.7::responseTime(service3, 0.5).
 0.3::responseTime(service3, 2).
+
+% default lattice l <= s <= ts
+leq(ann, l, s).
+leq(ann, s, ts).
 
 %app(OpA, AId, [SIds]).
 app(app1, [service1, service2, service3]).

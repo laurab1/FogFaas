@@ -3,8 +3,15 @@ func(mult,[y,v], 1, java, 10).
 func(div, [z,z], 2, python, 20).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(service1, triggerX, sum, 1, [ubuntu], [us]).
+service(service1, triggerX, div, 1, [ubuntu], [us]).
 service(service2, triggerY, div, 1, [sql], [us]).
+service(service3, triggerZ, seq(sum, send([x], service1, 1)), 1, [sql], [us]).
+
+0.7::responseTime(service1, 0.5).
+0.3::responseTime(service1, 2).
+
+0.7::responseTime(service3, 0.5).
+0.3::responseTime(service3, 2).
 
 %app(AId, [SIds]).
-app(app1, [service1, service2]).
+app(app1, [service1, service2, service3]).
