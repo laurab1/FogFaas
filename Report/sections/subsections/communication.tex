@@ -1,0 +1,15 @@
+\documentclass[../DraftNotes.tex]{subfiles}
+
+\begin{document}
+
+We consider the problem of representing synchronous communications between services in a fog environment. In this setting, a deployment of the application is possible if the nodes hosting two communicating services are actually connected by a physical link which meet some security requirements as, for istance, some constraints on the geographical location of the traversed nodes. \\
+In order to effectively represent communicating services, then, we have to represent the physical links and to provide a language construct for synchronous communications.
+\smallskip
+To tackle the problem, we opted for representing physical links as bidirectional links. This adds a level of complexity in finding a solution to the routing problem, as we have to solve it on a non-directed, cyclic graph, but it seemed a reasonable representation of a physical network. \\
+However, as said, we are representing synchronous communications between services, thus we provide a single language construct \emph{send(Args, Service)} to this end. Furthermore, since synchronous calls can lead to starvation, we assume the instruction to be provided with a timeout, hence having two cases:
+\begin{itemize}
+	\item the send operation succeeds: then the sent value is stored by the receiving service;
+	\item the send operation fails for exceeding timeout.
+\end{itemize}
+The possibility of failure is taken into account exploiting probability. Thus the user can provide the probability of timeout exceeding using the \emph{responseTime} predicate, which in turn is used inside the \emph{ctx} predicate. If the communication succeeds, then the security context of the receiving service is updated according to the security level of the received value, otherwise it stays unchanged. 
+\end{document}
