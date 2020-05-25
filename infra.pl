@@ -10,7 +10,7 @@ node(n3, amazon, 1, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n3).
 firewall(n3).
 
-node(n4, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, us).
+node(n4, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n4).
 firewall(n4).
 

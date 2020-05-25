@@ -33,8 +33,8 @@ placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFP
 placeFunctions(_, _, _, tau, _, [], _, _).
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, par(F1, F2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeParFunctions(AOp, (SId, Node), _, F1, Placement, PlacementTmp, Caps, CapsTmp),
-      placeParFunctions(AOp, (SId, Node), _, F2, PlacementTmp, NewPlacement, CapsTmp, NewCaps).
+      placeParFunctions(AOp, (SId, Node), ServicePlacement, F1, Placement, PlacementTmp, Caps, CapsTmp),
+      placeParFunctions(AOp, (SId, Node), ServicePlacement, F2, PlacementTmp, NewPlacement, CapsTmp, NewCaps).
 
 placeParFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
       func(FId, Args, HwReqs, PReqs, TUnits),
@@ -202,6 +202,13 @@ trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
 %security context
 ctx(_, tau, _ , _, _, _, _).
+ctx(AOp, par(F1, F2), L, Env, NewEnv, History, History) :- 
+    func(F1, Args1, _, _, _),
+    func(F2, Args2, _, _, _),
+    labelF(AOp, Args1, L),
+    labelF(AOp, Args2, L),
+    union(Env, Args1, TmpEnv),
+    union(TmpEnv, Args2, NewEnv).
 ctx(AOp, seq(P1, P2), L, Env, NewEnv, History, NewHistory) :- 
     ctx(AOp, P1, L, Env, TmpEnv, History, TmpHistory), 
     ctx(AOp, P2, L, TmpEnv, NewEnv, TmpHistory, NewHistory).
