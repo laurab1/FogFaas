@@ -9,7 +9,7 @@ In this preliminary work, we had a quite simple type system and few language con
 \subsection{Example: testing FogFaas basic functionalities}
 As a main example, we provide a set of services and a complete lattice (in particular a strict total order) as a labelling, as shown in fig.~\ref{fig:tot_order}.
 
-\begin{figure}[h!]
+\begin{figure}
 	\begin{center}
 	\begin{tikzpicture}
     	\node (top) at (0,0) {$\{ts\}$};
@@ -26,10 +26,10 @@ As a main example, we provide a set of services and a complete lattice (in parti
 This can be easily defined by the user by providing a suitable definition of the \emph{labelF} predicate as follows:
 
 \begin{verbatim}
-	labelF(ann, Args, ts).
-	labelF(ann, Args, s) :- 
+	labelF(default, Args, ts).
+	labelF(default, Args, s) :- 
                     findall(X, ts(X, Args), []).
-	labelF(ann, Args, l) :- 
+	labelF(default, Args, l) :- 
                     findall(X, notPublic(X, Args), []).
 \end{verbatim}
 
@@ -40,5 +40,7 @@ In this case, we just state that
 	\item a function can be secret iff it does not have top secret arguments,
 	\item a function can be low iff it does not have top secret or secret arguments.
 \end{itemize}
+
+In order to perform some security checks, in particular for communication between services and access to resources, a \emph{leq} predicate is also required, which mirrors the order relation induced by \emph{labelF}. The main example lattice and the resulting \emph{leq} predicate are provided as default.
 
 \end{document}

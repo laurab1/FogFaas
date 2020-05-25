@@ -17,7 +17,7 @@ s(x).
 l(y).
 l(t).
 
-trusts(ann, amazon).
+trusts(default, amazon).
 
 % functions
 
@@ -36,10 +36,6 @@ service(service3, triggerX, seq(sum, send([x], service1, 1)), 1, [ubuntu], [eu])
 
 0.7::responseTime(service3, 0.5).
 0.3::responseTime(service3, 2).
-
-% default lattice l <= s <= ts
-leq(ann, l, s).
-leq(ann, s, ts).
 
 %app(OpA, AId, [SIds]).
 app(app1, [service1, service2, service3]).
