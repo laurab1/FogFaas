@@ -171,15 +171,28 @@ ctx(AOp, FId, TUnits,L) :-
                 func(FId, Args, _, _, TUnits), % TUnits = Computational time for FId
                 labelF(AOp, Args, L). 
 
-% I assumed here ther will be only l 
-
-
-guardCheck(X):- not(X = ts),
+% those are the Label that are not allowed to use in guard
+guardCheck(X):- not(X = ts),    
                 not(X = s),
+                not(X = ts_eu),
+                not(X = ts_us),
                 not(X = s_eu),
                 not(X = s_us).
 
+%       ts
+%       |
+%       s
+%       |
+%       l
 
+%   ts_eu   ts_us
+%     |       |
+%   s_eu    s_us
+%      \    /
+%        l
+
+% l is the public label for two latices there fore
+% this guard will work for both latices
 
 %query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
 %query(placeApp(ann, app1, SP, FP)).
