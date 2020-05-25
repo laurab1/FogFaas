@@ -45,8 +45,8 @@ placeParFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId
       HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).   
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, seq(P1, P2), Placement, NewPlacement, Caps, NewCaps) :-
-      placeFunctions(AOp, (SId, Node), ServicePlacement, P1, Placement, PlacementTmp1, Caps, NewCaps1),
-      placeFunctions(AOp, (SId, Node), ServicePlacement, P2, Placement, PlacementTmp2, Caps, NewCaps2),
+      placeFunctions(AOp, (SId, Node), ServicePlacement, P1, Placement, PlacementTmp1, Caps, NewCaps),
+      placeFunctions(AOp, (SId, Node), ServicePlacement, P2, Placement, PlacementTmp2, Caps, NewCaps),
       append(PlacementTmp1, PlacementTmp2, NewPlacement).
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
