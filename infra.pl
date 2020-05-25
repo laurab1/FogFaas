@@ -1,18 +1,18 @@
-node(n1, amazon, 4, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
+node(n1, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n1).
 firewall(n1).
 
-node(n2, amazon, 4, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
+node(n2, amazon, 2, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
 encrypted_storage(n2).
 firewall(n2).
 
-node(n3, amazon, 1, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
+node(n3, amazon, 1, [ubuntu, sql], [python, rust, java, javascript], 0.001, us).
 encrypted_storage(n3).
-firewall(n3).
+%firewall(n3).
 
-node(n4, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
-encrypted_storage(n4).
-firewall(n4).
+%node(n4, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, eu).
+%encrypted_storage(n4).
+%firewall(n4).
 
 %link(l1, 1, [n1, n2]).
 %0.5::link(l1, 1, [n1, n2]).

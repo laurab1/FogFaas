@@ -90,6 +90,32 @@ By running the query
 query(placeApp(default, app1, SP, FP)).
 \end{verbatim}
 
-We get a suitable deployment: indeed, no service is placed on n3, as both the services are required to be deployed in Europe, while nodes n1 and n2 are eligible to host them as the met the top secret security requirements.
+we get a suitable deployment. Indeed, as shown in fig.~\ref{fig:Prel_deployment} no service is placed on n3, as both the services are required to be deployed in Europe, while nodes n1 and n2 are eligible to host them as the met the top secret security requirements. However, the function \emph{mult} can be deployed on the node n3, as its security level is low and functions has no particular geographical requirements.
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[scale=0.3]{sections/sect_images/Prel_results.png}
+	\caption{Possible deployments for the example application}
+  	\label{fig:Prel_deployment}
+  	\end{center}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+	\begin{tikzpicture}
+  			[scale=.8,every node/.style={circle}]
+  			\node (n1)[draw, align=left] at (3,8)  {\textbf{n1} \\
+  									$service1$ \\
+  									$div$};
+  			\node (n2)[draw, align=left] at (6,9)  {\textbf{n2} \\
+  									$service2$ \\
+  									$sum$};
+  			\node (n3)[draw, align=left] at (9,8) {\textbf{n3} \\
+  									$mult$};
+	\end{tikzpicture}
+	\caption{Graphical representation of a possible deployment}
+  	\label{fig:Graph_deployment}
+  	\end{center}
+\end{figure}
 
 \end{document}
