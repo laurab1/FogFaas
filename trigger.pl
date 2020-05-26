@@ -6,16 +6,16 @@ l(t).
 
 
 
-%trigger(TId, Params, Prog, Rule).
-trigger(triggerX, [x,y], sum, rule1).
-trigger(triggerY, [z,z], div, rule2).
-trigger(triggerZ, [x,y], sum, rule3).
+%trigger(TId, Prog, Rule).
+trigger(triggerX, sum, rule1).
+trigger(triggerY, div, rule2).
+trigger(triggerZ, sum, rule3).
 
 
 
 placeTriggers(AOp, [], T, T).
 placeTriggers(AOp, [TId|Rest], Placement, [(TId, NId)|NewPlacement], Caps, NewCaps) :-
-    trigger(TId, Params, Prog, Rule),
+    trigger(TId, Prog, Rule),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
@@ -32,8 +32,9 @@ labelTrigger(AOp, TId, L) :-
 
 
 
-placeFunctions(AOp, SId, fire(TId), Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
-    trigger(TId, Params, FId, Rule),
+placeFunctions(AOp, SId, fireTrigger(TId), Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
+    trigger(TId, FId, Rule),
+    func(FId, Args, HwReqs, PReqs, TUnits),
     node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
     trusts2(AOp, OpN),
     checkPlatforms(PReqs, FPlats),
@@ -42,7 +43,7 @@ placeFunctions(AOp, SId, fire(TId), Placement, [(SId, FId, NId)|Placement], Caps
 
 
 
-ctxFire(AOp, fire(TId), L) :-
-    trigger(TId, Args, FId, _),
+ctxFire(AOp, fireTrigger(TId), L) :-
+    trigger(TId, FId, _),
     func(FId, Args, _, _, _),
     labelF(AOp, Args, L). 
