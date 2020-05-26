@@ -1,4 +1,4 @@
-\documentclass[../extensions.tex]{subfiles}
+\documentclass[../DraftNotes.tex]{subfiles}
 
 \begin{document}
 
@@ -50,10 +50,11 @@ To fire a Trigger, I added a fireTrigger function and function placement.
 
 And security context of `fireTrigger` function is like this.
 
-    ctxFire(AOp, fireTrigger(TId), L) :-
+\begin{verbatim}
+	ctxFire(AOp, fireTrigger(TId), L) :-
         trigger(TId, FId, _),
         func(FId, Args, _, _, _),
         labelF(AOp, Args, L). 
-
+\end{verbatim}
 
 \end{document}
