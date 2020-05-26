@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.9.2)  24 MAY 2020 10:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.9.2)  26 MAY 2020 07:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -155,24 +155,29 @@ Package pdftex.def Info: Logo-UNIPisa.jpg  used on input line 9.
 UNIPisa.jpg>] (./sections/introduction.tex) (./sections/in_class_work.tex)
 (./sections/extensions.tex (./sections/subsections/communication.tex)
 (./sections/subsections/tau.tex) (./sections/subsections/type_system.tex
-Underfull \hbox (badness 10000) in paragraph at lines 5--14
+Underfull \hbox (badness 10000) in paragraph at lines 4--11
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 5--14
+Underfull \hbox (badness 10000) in paragraph at lines 4--11
 
  []
 
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 14.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 13.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 14.
-)
-(./sections/subsections/trigger.tex)) (./sections/integration.tex)
-(./sections/conclusions.tex) [1] [2] (./DraftNotes.aux) ) 
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 13.
+
+Overfull \hbox (18.33412pt too wide) in paragraph at lines 19--21
+\OT1/cmr/m/n/10 Termination chan-nels sig-nal in-for-ma-tion through the ter-mi
+-na-tion or non-termination
+ []
+
+[1]) (./sections/subsections/trigger.tex)) (./sections/integration.tex)
+(./sections/conclusions.tex) [2] (./DraftNotes.aux) ) 
 Here is how much of TeX's memory you used:
  1628 strings out of 492616
  24260 string characters out of 6129482
@@ -180,12 +185,12 @@ Here is how much of TeX's memory you used:
  5522 multiletter control sequences out of 15000+600000
  5456 words of font info for 20 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,5n,25p,517b,238s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/20
-19/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/201
-9/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2019/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on DraftNotes.pdf (3 pages, 92731 bytes).
+ 41i,5n,25p,567b,238s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2019/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2019/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2019/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on DraftNotes.pdf (3 pages, 93659 bytes).
 PDF statistics:
  27 PDF objects out of 1000 (max. 8388607)
  17 compressed objects within 1 object stream
