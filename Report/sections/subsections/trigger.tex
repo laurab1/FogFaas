@@ -4,12 +4,6 @@
 
 In Serverless computing, also known as functions-as-a-service, we are writing short-running, stateless functions that can be triggered by events generated from services or users.
 
-In our application we use these functions.
-    - func(sum, [x,y], 1, rust, 10).
-    - func(mult,[y,t], 1, java, 10).
-    - func(div, [z,z], 2, python, 20).
-
-
 In Faas, a program consists of one or more rules. 
 
 A rule is constructed by the when combinator over a given trigger and action.
@@ -18,19 +12,21 @@ So, We have to create a rule to register an action as a new consumer of a trigge
 
 I defined the rules like this.
     
-    - rule(RuleName, TriggerId, ActionId).
-
-
+\begin{verbatim}
+    rule(RuleName, TriggerId, ActionId).
+\end{verbatim}
 
 When we deploy an application, we had placed Services and Functions. 
 
 I also did Trigger placement in this part. 
 
+\begin{verbatim}
     placeApp(AOp, AId, ...):-
         app(AId, Services),
         placeServices(AOp, Services, ...),
         placeTriggers(AOp, Triggers, ...),
         placeAllFunctions(AOp, ...).
+\end{verbatim}
 
 And we are using these triggers in the services. So it is defined in services like this.
 
@@ -39,9 +35,11 @@ And we are using these triggers in the services. So it is defined in services li
 
 I defined trigger in our application like this.
 
+\begin{verbatim}
     trigger(TId, Prog, Rule).
+\end{verbatim}
 
-Here, trigger uniquelly identified by TId. This trigger will fire Action `Prog`.
+Here, triggers are uniquely identified by a TId. This trigger will fire Action `Prog`.
 
 
 To fire a Trigger, I added a fireTrigger function and function placement.

@@ -17,7 +17,6 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
 placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
     app(AId, Services),
     placeServices(AOp, Services, [], ServicePlacement, [], Caps),
-    %placeTriggers(AOp, Triggers, [], TriggerPlacement, [], Caps),
     placeAllFunctions(AOp, ServicePlacement, ServicePlacement, [], FunctionPlacement, Caps).
 
 placeAllFunctions(_, [], _, FP, FP, _).
@@ -39,7 +38,6 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, par(F1, F2), Placement, NewPl
 
 placeParFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
       func(FId, Args, HwReqs, PReqs, TUnits),
-      trigger(SId, Trig, Prog, _),
       node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
       trusts2(AOp, OpN),
       checkPlatforms(PReqs, FPlats),
@@ -53,7 +51,6 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, seq(P1, P2), Placement, NewPl
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, Caps) :-
     func(FId, Args, HwReqs, PReqs, TUnits),
-    trigger(SId, Trig, Prog, _),
     node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
     trusts2(AOp, OpN),
     checkPlatforms(PReqs, FPlats),
@@ -94,12 +91,14 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, trc(P1, P2), Placement, NewPl
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, send(Args, Service, _), Placement, Placement, Caps, Caps) :-
     findNode(Service, TargetNode, ServicePlacement),
-    labelF(AOp, Args, ReqSecurity),
+    labelF(AOp, Args, ReqSecurity).
     findRoute(AOp, 0, Latency, Node, Node, TargetNode, ReqSecurity, [Source | Route]).
     
 placeFunctions(AOp, (SId, Node), ServicePlacement, read(Res, CD, COI, Var), Placement, Placement, Caps, Caps).
 placeFunctions(AOp, (SId, Node), ServicePlacement, write(Var, Res, CD, COI), Placement, Placement, Caps, Caps).
 placeFunctions(AOp, (SId, Node), ServicePlacement, new(Res, CD, COI, LRes), Placement, Placement, Caps, Caps).
+
+placeFunctions(AOp, (SId, Node), ServicePlacement, fireTrigger(TId), Placement, Placement, Caps, Caps).  
 
 % ACCESS CONTROL
 
@@ -172,7 +171,8 @@ leq(AOp, X, X).
 leq2(AOp, A, B) :- leq(AOp, A, B).   
 leq2(AOp, A, B) :- leq(AOp, A, C), leq2(AOp, C, B), A \== B.
 
-% default lattice l <= s <= ts
+%%%%%%%%%%% DEFAULT OPTIONS %%%%%%%%%%%
+
 leq(default, l, s).
 leq(default, s, ts).
 
@@ -184,9 +184,7 @@ ts(X, Args) :- member(X, Args), ts(X).
 
 guardCheck(default, l).
 
-% labels a service composing multiple functions
-% NOT NEEDED
-%labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L, []).
+trusts(default, amazon).
 
 labelL(AOp, L, Lbl) :- 
                     link(L, _, [N1, N2]),
@@ -271,12 +269,19 @@ ctx(AOp, write(Var, Res, CD, COI), LRes, Env, Env, History, History) :-
     assertz(NewSecLevel).
 ctx(AOp, new(Res, CD, COI, LRes), LRes, Env, Env, History, History) :-
     assertz(labelResource(Res, CD, COI, LRes)).
-
+ctx(AOp, fireTrigger(TId), L, Env, Env, History, History) :-
+    trigger(SId, TId, FId),
+    func(FId, Args, _, _, _),
+    labelF(AOp, Args, L),
+    service(SId, _, Prog, _, _, _),
+    ctx(AOp, Prog, L2, [], ServEnv, [], ServHistory),
+    leq2(AOp, L2, L). 
 
 checkTime(tau, 0).
 checkTime(read(_, _, _, _), 0).
 checkTime(write(_, _, _, _), 0).
 checkTime(send(_, _, _), 0).
+checkTime(fireTrigger(_, _, _), 0).
 checkTime(par(P1, P2), SeqTUnits) :- 
     checkTime(P1, FstTUnits), 
     checkTime(P2, SndTUnits), 
@@ -301,4 +306,3 @@ checkTime(ife(FId, P1, P2), TUnits) :-
     checkTime(P2, TUnitsE), 
     TUnitsT == TUnitsE,
     TUnits is TUnitsT.
-

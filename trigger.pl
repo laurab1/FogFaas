@@ -8,9 +8,6 @@ l(t).
 
 %trigger(TId, Prog, Rule).
 
-
-
-
 placeTriggers(AOp, [], T, T).
 placeTriggers(AOp, [TId|Rest], Placement, [(TId, NId)|NewPlacement], Caps, NewCaps) :-
     trigger(TId, Prog, Rule),
