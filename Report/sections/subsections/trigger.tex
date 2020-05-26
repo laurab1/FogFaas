@@ -2,6 +2,16 @@
 
 \begin{document}
 
+In Serverless computing, also known as functions-as-a-service, we are writing short-running, stateless functions that can be triggered by events generated from services or users.
 
+We have to create a rule to register an action as a new consumer of a trigger.
+
+A program consists of one or more rules; a rule is constructed by the when combinator over a given trigger and action.
+
+rule(RuleName, TriggerId, ActionId)
+
+Here, an action is a stateless function, uniquely identified by a name.
+
+func(FId, ...)
 
 \end{document}
