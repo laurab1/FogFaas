@@ -31,7 +31,7 @@ body {
 
 .swiper-slide {
   font-size: 18px;
-      color:white;
+      color:black;
       -webkit-box-sizing: border-box;
       box-sizing: border-box;
       padding: 40px 60px;
@@ -60,4 +60,28 @@ body {
 
 .content {
   width: 70%;
+  text-align: left;
+  font-size: 30px;
+}
+
+.subtitle {
+  position: absolute;
+  top: 70vh;
+  left: 50%; 
+  transform: translate(-50%, -50%);
+  width: 50%; 
+  text-align: center; 
+  height: auto;
+  font-size: 30px;
+}
+
+.title {
+  position: absolute;
+  text-align: center;
+  top: 15vh;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  width: 70%;
+  height: 10px;
+  font-size: 40px;
 }
