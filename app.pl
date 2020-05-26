@@ -24,17 +24,19 @@ func(mult,[y,t], 1, java, 10).
 func(div, [z,z], 2, python, 20).
 func(true, [], 1, python, 5).
 
-0.2::trigger(service3, triggerX, sum).
-0.5::trigger(service1, triggerY, div).
-0.3::trigger(service2, triggerZ, sum).
+0.6::trigger(service3, triggerX, sum).
+0.4::trigger(service2, triggerX, sum).
+trigger(service2, triggerY, div).
+0.2::trigger(service3, triggerZ, div).
+0.8::trigger(service2, triggerZ, div).
 
 rule(triggerX, [eu]).
 rule(triggerY, [us]).
-rule(triggerZ, [us]).
+rule(triggerZ, [eu, us]).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(service1, triggerX, seq(sum, fireTrigger(triggerX)), 1, [ubuntu], [eu]).
-service(service2, triggerY, div, 1, [sql], [eu]).
+service(service1, triggerX, seq(seq(sum, fireTrigger(triggerZ)), fireTrigger(triggerX)), 1, [ubuntu], [eu]).
+service(service2, triggerY, div, 1, [sql], [us]).
 service(service3, triggerX, seq(sum, send([x], service1, 1)), 1, [ubuntu], [eu]).
 
 0.7::responseTime(service1, 0.5).
