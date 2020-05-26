@@ -179,6 +179,8 @@ labelF(default, Args, l) :- findall(X, notPublic(X, Args), []).
 notPublic(X, Args) :-  member(X, Args),(ts(X);s(X)). 
 ts(X, Args) :- member(X, Args), ts(X).
 
+guardCheck(default, l).
+
 % labels a service composing multiple functions
 % NOT NEEDED
 %labelS(AOp, SId, L) :- service(SId, _, P, _, _, _), ctx(AOp, P, L, []).
@@ -212,19 +214,22 @@ ctx(AOp, par(F1, F2), L, Env, NewEnv, History, History) :-
 ctx(AOp, seq(P1, P2), L, Env, NewEnv, History, NewHistory) :- 
     ctx(AOp, P1, L, Env, TmpEnv, History, TmpHistory), 
     ctx(AOp, P2, L, TmpEnv, NewEnv, TmpHistory, NewHistory).
-ctx(AOp, ife(FId, P1, _), L, Env, NewEnv, History, NewHistory) :-
+ctx(AOp, ife(FId, P1, P2), L, Env, NewEnv, History, NewHistory) :-
    func(FId, Args, _, _, _),
+   checkTime(ife(FId, P1, P2), _),
    labelF(AOp, Args, L),
    union(Env, Args, TmpEnv),
    ctx(AOp, P1, L, TmpEnv, NewEnv, History, NewHistory).
-ctx(AOp, ife(FId, _, P2), L, Env, NewEnv, History, NewHistory) :-
+ctx(AOp, ife(FId, P1, P2), L, Env, NewEnv, History, NewHistory) :-
    func(FId, Args, _, _, _),
+   checkTime(ife(FId, P1, P2), _),
    labelF(AOp, Args, L),
    union(Env, Args, TmpEnv),
    ctx(AOp, P2, L, TmpEnv, NewEnv, History, NewHistory).
 ctx(AOp, whl(FId, P), L, Env, NewEnv, History, NewHistory) :-
    func(FId, Args, _, _, _),
    labelF(AOp, Args, L),
+   guardCheck(AOp, L),
    union(Env, Args, TmpEnv),
    ctx(AOp, P, L, TmpEnv, NewEnv, History, NewHistory).
 ctx(AOp, trc(P1, P2), L, Env, NewEnv, History, NewHistory) :- 
@@ -263,3 +268,33 @@ ctx(AOp, write(Var, Res, CD, COI), LRes, Env, Env, History, History) :-
     assertz(NewSecLevel).
 ctx(AOp, new(Res, CD, COI, LRes), LRes, Env, Env, History, History) :-
     assertz(labelResource(Res, CD, COI, LRes)).
+
+
+checkTime(tau, 0).
+checkTime(read(_, _, _, _), 0).
+checkTime(write(_, _, _, _), 0).
+checkTime(send(_, _, _), 0).
+checkTime(par(P1, P2), SeqTUnits) :- 
+    checkTime(P1, FstTUnits), 
+    checkTime(P2, SndTUnits), 
+    SeqTUnits is max(FstTUnits, SndTUnits).
+checkTime(seq(P1, P2), SeqTUnits) :- 
+    checkTime(P1, FstTUnits), 
+    checkTime(P2, SndTUnits), 
+    SeqTUnits is FstTUnits + SndTUnits.
+checkTime(FId, TUnits) :- func(FId, _, _, _, TUnits).
+checkTime(whl(FId, P), TUnitsW) :- 
+    checkTime(FId, CTUnits), 
+    checkTime(P, BTunits), 
+    TUnitsW is CTUnits + BTunits.
+checkTime(trc(P1, P2), TUnitsTRC) :- 
+    checkTime(P1, TTUnits), 
+    checkTime(P2, CTUnits), 
+    TTUnits == CTUnits, 
+    TUnitsTRC is TTUnits + CTUnits.
+checkTime(ife(FId, P1, P2), TUnits) :- 
+    checkTime(FId, CG), 
+    checkTime(P1, TUnitsT), 
+    checkTime(P2, TUnitsE), 
+    TUnitsT == TUnitsE,
+    TUnits is TUnitsT.
