@@ -7,9 +7,7 @@ l(t).
 
 
 %trigger(TId, Prog, Rule).
-trigger(triggerX, sum, rule1).
-trigger(triggerY, div, rule2).
-trigger(triggerZ, sum, rule3).
+
 
 
 

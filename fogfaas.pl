@@ -7,7 +7,6 @@ placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
     service(SId, Trig, Prog, HwReqs, PReqs, Geo),
     ctx(AOp, Prog, L, [], Env, [], History),
-    trigger(Trig, _, Prog, _),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
@@ -15,16 +14,15 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
     checkHw(HwCaps, HwReqs, NId, Caps, TmpCaps),
     placeServices(AOp, Rest, Placement, NewPlacement, TmpCaps, NewCaps).
 
-placeApp(AOp, AId, ServicePlacement, TriggerPlacement, FunctionPlacement):-
+placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
     app(AId, Services),
     placeServices(AOp, Services, [], ServicePlacement, [], Caps),
-    placeTriggers(AOp, Triggers, [], TriggerPlacement, [], Caps),
+    %placeTriggers(AOp, Triggers, [], TriggerPlacement, [], Caps),
     placeAllFunctions(AOp, ServicePlacement, ServicePlacement, [], FunctionPlacement, Caps).
 
 placeAllFunctions(_, [], _, FP, FP, _).
 placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFPlacement, Caps) :-
     service(SId, TId, Prog, _, _, _),
-    trigger(TId, _, Prog, _),
     placeFunctions(AOp, (SId, Node), GlobPlacement, Prog, FPlacement, TmpFPlacement, Caps, NewCaps),
     placeAllFunctions(AOp, Placement, GlobPlacement, TmpFPlacement, NewFPlacement, NewCaps).
     
@@ -41,6 +39,7 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, par(F1, F2), Placement, NewPl
 
 placeParFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, NewCaps) :-
       func(FId, Args, HwReqs, PReqs, TUnits),
+      trigger(SId, Trig, Prog, _),
       node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
       trusts2(AOp, OpN),
       checkPlatforms(PReqs, FPlats),
@@ -54,6 +53,7 @@ placeFunctions(AOp, (SId, Node), ServicePlacement, seq(P1, P2), Placement, NewPl
 
 placeFunctions(AOp, (SId, Node), ServicePlacement, FId, Placement, [(SId, FId, NId)|Placement], Caps, Caps) :-
     func(FId, Args, HwReqs, PReqs, TUnits),
+    trigger(SId, Trig, Prog, _),
     node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
     trusts2(AOp, OpN),
     checkPlatforms(PReqs, FPlats),
