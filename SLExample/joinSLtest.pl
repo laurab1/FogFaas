@@ -9,6 +9,8 @@ s(z, us).
 ts(v, eu).
 ts(w, us).
 
+guardCheck(bob, l).
+
 labelF(bob, Args, ts_eu) :- findall(X, isUs(X, Args), []).
 labelF(bob, Args, ts_us) :- findall(X, isEu(X, Args), []).
 isUs(X, Args) :- member(X, Args),(s(X, us); ts(X, us)).
