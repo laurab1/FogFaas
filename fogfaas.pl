@@ -11,7 +11,7 @@ app(app1, [service1, service2]).
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
     service(SId, Trig, Prog, HwReqs, PReqs, Geo),
-    trigger(Trig, Prog, ETime),
+    trigger(Trig, _, Prog, _),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
@@ -22,12 +22,13 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
 placeApp(AOp, AId, ServicePlacement, TriggerPlacement, FunctionPlacement):-
     app(AId, Services),
     placeServices(AOp, Services, [], ServicePlacement, [], Caps),
-    placeTriggers(AOp, Triggers, [], TriggerPlacement),
+    placeTriggers(AOp, Triggers, [], TriggerPlacement, [], Caps),
     placeAllFunctions(AOp, ServicePlacement, [], FunctionPlacement, Caps).
 
-placeAllFunctions(_, [], TP, FP, FP, _).
+placeAllFunctions(_, [], FP, FP, _).
 placeAllFunctions(AOp, [(SId, _)|Placement], FPlacement, NewFPlacement, Caps) :-
-    service(SId, _, Prog, _, _, _),
+    service(SId, TId, Prog, _, _, _),
+    trigger(TId, _, Prog, _),
     placeFunctions(AOp, SId, Prog, FPlacement, TmpFPlacement, Caps, NewCaps),
     placeAllFunctions(AOp, Placement, TmpFPlacement, NewFPlacement, NewCaps).
     
@@ -250,3 +251,20 @@ query(ctx(ann,whl(mult,mult),T,L)).
 % insecure
 query(ctx(ann,whl(div,sum),T,L)).
 query(ctx(ann,whl(sum,sum),T,L)).
+
+
+
+% for triggers
+
+query(service(service2, triggerY, div, 1, [sql], [eu])).
+
+
+query(trigger(triggerX, sum, _)).
+
+query(trigger(triggerY, div, _)).
+query(trigger(triggerZ, sum, _)).
+
+% query(trigger(triggerY, _, _)).
+
+
+query(ctxFire(ann, fireTrigger(triggerX), L)).
