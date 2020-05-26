@@ -182,71 +182,57 @@ guardCheck(X):- not(X = ts),
                 not(X = s_eu),
                 not(X = s_us).
 
-%       ts
-%       |
-%       s
-%       |
-%       l
-
-%   ts_eu   ts_us
-%     |       |
-%   s_eu    s_us
-%      \    /
-%        l
-
-% l is the public label for two latices there fore
-% this guard will work for both latices
-
-%query(placeFunctions(ann, service1, seq(mult, div), [], R, [], C)).
-%query(placeApp(ann, app1, SP, FP)).
-
 % Security Context Test
+% Variables
 ts(z).
 s(x).
 l(y).
 l(t).
 
+% Functions
 func(sum, [x,y], 1, rust, 10).
 func(mult,[y,t], 1, java, 10).
 func(div, [z,z], 2, python, 20).
 
-% --------- if-then-else-test ----------
-% if else with two program
-% secure 
-query(ctx(ann,ife(div, mult, sum), _,L)).
-% insecure
-query(ctx(ann,ife(div, mult, div), _,L)).
+% Queries
+% ------- if-then-else ----------
 
-% if with sequential program
-% secure         
-query(ctx(ann,ife(div, seq(sum,sum), div ), _,L)).
-query(ctx(ann,ife(mult, div, seq(sum,sum)), _,L)).
-query(ctx(ann,ife(mult, seq(mult,mult), seq(sum,sum)), _,L)).
+% ------- Secure Queries with Two Program -----
+query(ctx(ann,ife(div, mult, sum), _,L)). % ts
+query(ctx(ann,ife(mult, mult, sum), _,L)). % ts, s 
+query(ctx(ann,ife(mult, mult, mult), _,L)). % ts, s , l
 
-% insecure
+% ------- Insecure Queries with Two Program -----
+query(ctx(ann,ife(div, mult, div), _,L)). % Fails
+query(ctx(ann,ife(div, div, sum), _,L)).  % Fails
+
+% ------- Secure Queries with Sequential Program -----
+query(ctx(ann,ife(div, seq(sum,sum), div ), _,L)).  
+query(ctx(ann,ife(mult, seq(sum,sum), seq(sum,sum) ), _,L)).
+
+% ------- Insecure Queries with Sequential Program -----
 query(ctx(ann,ife(mult, seq(mult,mult),sum), _,L)).
 query(ctx(ann,ife(mult,sum,seq(mult,mult)), _,L)).
 
-% if with while loop
-%secure
-query(ctx(ann,ife(mult, whl(sum,sum),seq(sum,sum)), _,L)).
-query(ctx(ann,ife(mult, whl(sum,sum),div), _,L)).
-%insecure
-query(ctx(ann,ife(mult, whl(sum,sum),sum), _,L)).
-
-% if with trc 
-% secure
+% ------- Secure Queries with Try Catch Program -----
 query(ctx(ann,ife(mult,trc(sum,sum),sum),T,L)).
 query(ctx(ann,ife(mult,trc(div,div),seq(sum,sum)),T,L)).
 
-% insecure
+% ------- Insecure Queries with Try Catch Program -----
 query(ctx(ann,ife(mult,trc(div,sum),sum),T,L)).
 query(ctx(ann,ife(mult,trc(div,sum),seq(sum,sum)),T,L)).
 
+% ------- Secure Queries with While Program -----
+query(ctx(ann,ife(mult, whl(mult,mult),whl(mult,mult)), _,L)).
 
-% While test
-% secure
+% ------- Insecure Queries with While Program -----
+query(ctx(ann,ife(mult, whl(div,mult),whl(sum,mult)), _,L)).
+
+% ---------------- While --------------------
+% --------- Secure queries -------------
 query(ctx(ann,whl(mult,mult),T,L)).
-% insecure
+
+% --------- Insecure queries -----------
+query(ctx(ann,whl(sum,mult),T,L)).
 query(ctx(ann,whl(div,sum),T,L)).
-query(ctx(ann,whl(sum,sum),T,L)).
+
