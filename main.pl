@@ -11,7 +11,7 @@ query(placeApp(default, app1, SP, FP)).
 
 %query(placeAllFunctions(default, [(service1, n1),(service2,n2), (service3, n3)], [(service1, n1),(service2,n2), (service3, n3)], [], NewFPlacement, NewCaps)).
 
-%query(findRoute(ann, 0, L, n1, n1, n3, s, R)).
+query(findRoute(default, 0, L, n1, n1, n3, s, R)).
 
 %query(isConnected(N, n1, L, LinkLatency)).
 

@@ -24,9 +24,13 @@ func(mult,[y,t], 1, java, 10).
 func(div, [z,z], 2, python, 20).
 func(true, [], 1, python, 5).
 
-trigger(service3, triggerX, sum).
-trigger(service1, triggerY, div).
-trigger(service2, triggerZ, sum).
+0.2::trigger(service3, triggerX, sum).
+0.5::trigger(service1, triggerY, div).
+0.3::trigger(service2, triggerZ, sum).
+
+rule(triggerX, [eu]).
+rule(triggerY, [us]).
+rule(triggerZ, [us]).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
 service(service1, triggerX, seq(sum, fireTrigger(triggerX)), 1, [ubuntu], [eu]).
