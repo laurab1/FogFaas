@@ -1,5 +1,6 @@
 :- consult('app.pl').
 :- consult('infra.pl').
+:- consult('trigger.pl').
 :- consult('fogfaas.pl').
 
 query(placeFunctions(default, (service1, n1), [(service1, n1),(service2,n2)], par(sum, mult), [], R, [], C)).

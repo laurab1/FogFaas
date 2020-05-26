@@ -5,8 +5,9 @@
 
 placeServices(AOp, [], P, P, C, C).
 placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCaps) :-
-    service(SId, _, Prog, HwReqs, PReqs, Geo),
+    service(SId, Trig, Prog, HwReqs, PReqs, Geo),
     ctx(AOp, Prog, L, [], Env, [], History),
+    trigger(Trig, _, Prog, _),
     node(NId, OpN, HwCaps, SPlats, _, CostPU, NodeLoc),
     member(NodeLoc, Geo),
     subset(PReqs, SPlats),
@@ -14,14 +15,16 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
     checkHw(HwCaps, HwReqs, NId, Caps, TmpCaps),
     placeServices(AOp, Rest, Placement, NewPlacement, TmpCaps, NewCaps).
 
-placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
+placeApp(AOp, AId, ServicePlacement, TriggerPlacement, FunctionPlacement):-
     app(AId, Services),
     placeServices(AOp, Services, [], ServicePlacement, [], Caps),
+    placeTriggers(AOp, Triggers, [], TriggerPlacement, [], Caps),
     placeAllFunctions(AOp, ServicePlacement, ServicePlacement, [], FunctionPlacement, Caps).
 
 placeAllFunctions(_, [], _, FP, FP, _).
 placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFPlacement, Caps) :-
-    service(SId, _, Prog, _, _, _),
+    service(SId, TId, Prog, _, _, _),
+    trigger(TId, _, Prog, _),
     placeFunctions(AOp, (SId, Node), GlobPlacement, Prog, FPlacement, TmpFPlacement, Caps, NewCaps),
     placeAllFunctions(AOp, Placement, GlobPlacement, TmpFPlacement, NewFPlacement, NewCaps).
     
@@ -298,3 +301,4 @@ checkTime(ife(FId, P1, P2), TUnits) :-
     checkTime(P2, TUnitsE), 
     TUnitsT == TUnitsE,
     TUnits is TUnitsT.
+
