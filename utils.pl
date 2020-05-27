@@ -46,7 +46,7 @@ isConnected(Source, Step, L, LinkLatency) :-
 
 computeCost(Placement, Cost) :- computeCost(Placement, 0, Cost).
 computeCost([],Cost,Cost).
-computeCost([(FId, NId)|Placement], Cost, NewCost) :-
+computeCost([(SId, FId, NId)|Placement], Cost, NewCost) :-
     func(FId, _, _, _, TUnits),
     node(NId, _, _, _, _, CostPU, _),
     TmpCost is TUnits * CostPU + Cost,

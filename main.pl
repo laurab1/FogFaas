@@ -8,6 +8,8 @@
 
 query(placeApp(default, app1, SP, FP)).
 
+%query(computeCost(FP, Cost)).
+
 %query(placeAllFunctions(default, [(webserver, n1), (placesService, n5)], [(webserver, n1), (placesService, n5)], [], NewFPlacement, NewCaps)).
 
 %query(findRoute(default, 0, L, n1, n1, n3, s, R)).

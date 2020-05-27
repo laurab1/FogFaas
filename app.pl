@@ -24,10 +24,10 @@ ts(z).
 % functions
 
 func(notification, [], 3, kotlin, 10).
-func(distance, [pos1, pos2], 2, python, 20).
+func(distance, [pos1, pos2], 4, python, 20).
 func(true, [], 1, python, 5).
-func(computePlace, [place], 1, python, 10).
-func(formatData, [pos1], 3, java, 10).
+func(computePlace, [place], 2, python, 10).
+func(formatData, [pos1], 4, java, 10).
 
 0.5::trigger(webserver, triggerZ, notification).
 
@@ -39,7 +39,7 @@ labelResource(places, asl, files, ts).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).  whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], placesService, 1))))
 service(webserver, triggerX,  whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], contactsService, 1)))), 3, [ubuntu], [eu]).
-service(contactsService, triggerY, whl(true, seq(read(contacts_log, asl, files, pos2), ife(distance, seq(computePlace, send([place], placesService, 0.8)), computePlace))), 4, [ubuntu, sql], [eu]).
+service(contactsService, triggerY, whl(true, seq(read(contacts_log, asl, files, pos2), ife(distance, seq(computePlace, send([place], placesService, 0.8)), computePlace))), 2, [ubuntu, sql], [eu]).
 service(placesService, triggerZ, seq(write(place, places, asl, files), fireTrigger(triggerZ)), 2, [sql], [eu, us]).
 
 0.7::responseTime(contactsService, 0.5).

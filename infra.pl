@@ -1,26 +1,26 @@
-node(n1, amazon, 3, [ubuntu], [python, java, rust], 0.003, eu).
+node(n1, amazon, 4, [ubuntu], [python, java, rust], 0.003, eu).
 encrypted_storage(n1).
 firewall(n1).
 
-node(n2, amazon, 3, [ubuntu, sql], [python, rust, kotlin], 0.001, eu).
+node(n2, amazon, 2, [ubuntu, sql], [python, rust, kotlin], 0.001, eu).
 %encrypted_storage(n2).
 firewall(n2).
 
-node(n3, amazon, 3, [ubuntu, sql], [kotlin, java, javascript], 0.003, eu).
+node(n3, azure, 3, [ubuntu, sql], [kotlin, java, javascript], 0.003, eu).
 encrypted_storage(n3).
 firewall(n3).
 
-node(n4, amazon, 3, [ubuntu, sql], [python, kotlin], 0.001, eu).
+node(n4, amazon, 4, [ubuntu], [python, kotlin], 0.001, eu).
 encrypted_storage(n4).
 firewall(n4).
 
-node(n5, amazon, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, us).
+node(n5, azure, 3, [ubuntu, sql], [python, rust, java, javascript], 0.001, us).
 %encrypted_storage(n5).
 firewall(n5).
 
-%node(n6, azure, 3, [ubuntu, sql], [python, kotlin], 0.004, eu).
+node(n6, ibm, 2, [ubuntu, sql], [python, kotlin], 0.004, us).
 %encrypted_storage(n6).
-%firewall(n6).
+firewall(n6).
 %
 %node(n7, azure, 6, [ubuntu, sql], [python, kotlin], 0.004, eu).
 %encrypted_storage(n7).
