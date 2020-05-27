@@ -9,4 +9,4 @@ query(labelF(bob, [y], L)).
 
 %query(placeServices(bob, [service1, service2], [], P, [], C)).
 
-query(placeApp(bob, app1, SP, FP)).
+query(placeApp(bob, app1, SP, FP, Cost)).
