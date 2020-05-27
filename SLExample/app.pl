@@ -1,5 +1,5 @@
 func(sum, [x,z], 1, rust, 10).
-func(mult,[y,v], 1, java, 10).
+func(mult,[y,vz], 1, java, 10).
 func(div, [z,z], 2, python, 20).
 func(true, [], 1, python, 5).
 
