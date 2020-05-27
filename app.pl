@@ -29,7 +29,7 @@ func(true, [], 1, rust, 5).
 func(computePlace, [place], 2, python, 10).
 func(formatData, [pos1], 4, java, 10).
 
-0.5::trigger(webserver, triggerZ, notification).
+0.5::trigger(contactsService, triggerZ, notification).
 
 rule(triggerZ, [eu, us]).
 
