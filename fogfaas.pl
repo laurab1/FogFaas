@@ -13,10 +13,11 @@ placeServices(AOp, [SId|Rest], Placement, [(SId, NId)|NewPlacement], Caps, NewCa
     checkHw(HwCaps, HwReqs, NId, Caps, TmpCaps),
     placeServices(AOp, Rest, Placement, NewPlacement, TmpCaps, NewCaps).
 
-placeApp(AOp, AId, ServicePlacement, FunctionPlacement):-
+placeApp(AOp, AId, ServicePlacement, FunctionPlacement, Cost):-
     app(AId, Services),
     placeServices(AOp, Services, [], ServicePlacement, [], Caps),
-    placeAllFunctions(AOp, ServicePlacement, ServicePlacement, [], FunctionPlacement, Caps).
+    placeAllFunctions(AOp, ServicePlacement, ServicePlacement, [], FunctionPlacement, Caps),
+    computeCost(FunctionPlacement, Cost).
 
 placeAllFunctions(_, [], _, FP, FP, _).
 placeAllFunctions(AOp, [(SId, Node)|Placement], GlobPlacement, FPlacement, NewFPlacement, Caps) :-

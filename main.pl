@@ -6,7 +6,7 @@
 
 %query(placeServices(default, [webserver, placesService], [], P, [], C)).
 
-query(placeApp(default, app1, SP, FP)).
+query(placeApp(default, app1, SP, FP, Cost)).
 
 %query(computeCost(FP, Cost)).
 

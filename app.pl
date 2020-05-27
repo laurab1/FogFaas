@@ -25,7 +25,7 @@ ts(z).
 
 func(notification, [], 3, kotlin, 10).
 func(distance, [pos1, pos2], 4, python, 20).
-func(true, [], 1, python, 5).
+func(true, [], 1, rust, 5).
 func(computePlace, [place], 2, python, 10).
 func(formatData, [pos1], 4, java, 10).
 
