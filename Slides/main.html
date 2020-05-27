@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.min.css">
     <link rel="stylesheet" href="style/main_style.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://unpkg.com/swiper/js/swiper.js"></script>
     <script src="https://unpkg.com/swiper/js/swiper.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
@@ -68,17 +69,34 @@
         </div>
         <div class="swiper-slide">
           <p class="title">
-            Title
+            Security: default options
           </p>
-          <p class="content">
-            Lorem ipsum dolor sit amet, consectetur adipisci elit, 
-            sed do eiusmod tempor incidunt ut labore et dolore magna aliqua. 
-            Ut enim ad minim veniam, quis nostrum exercitationem ullamco 
-            laboriosam, nisi ut aliquid ex ea commodi consequatur. 
-            Duis aute irure reprehenderit in voluptate velit esse cillum 
-            dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat 
-            non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+          <ul class="content">
+            <li>We provide functions with a security label which depends on the labelling of
+              parameters.
+            </li>
+            <li>The default labelling is \( \{l, \ s, \ ts \}\), with  \(l \lt s \lt ts\).
+            </li>
+            <li>This can be easily defined with few lines of code.</li>
+            <button id="1" class="button">
+              Code here!
+            </button>
+            <div id="modal1" class="w3-modal" style="position: absolute;">
+              <div class="w3-modal-content w3-animate-top w3-card-4 w3-animate-opacity" style="background-color: lightgray; padding: 10px 10px;">
+                <span id="1" class="close" style="color: gray; cursor: pointer;">&times;</span>
+                <ul class="content">
+                  <li>leq(default, l, s).<br>
+                  leq(default, s, ts).</li>
+                  <li>labelF(default, Args, ts).<br>
+                  labelF(default, rgs, s) :- findall(X, ts(X, Args), []).<br>
+                  labelF(default, Args, l) :- findall(X, notPublic(X, Args), []).<br>
+                  notPublic(X, Args) :-  member(X, Args),(ts(X);s(X)).<br>
+                  ts(X, Args) :- member(X, Args), ts(X).</li>
+                  </ul>
+              </div>
+            </div>
+          </ul>
+          
         </div>
       </div>
       <div class="swiper-pagination"></div>

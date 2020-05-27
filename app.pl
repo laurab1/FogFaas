@@ -12,9 +12,10 @@ labelN(default, N, OpN, Geo, l) :-
 
 %%%%%%%%%%%%%%%% App %%%%%%%%%%%%%%%%
 
-s(pos1).
-s(pos2).
-l(x).
+ts(pos1).
+ts(pos2).
+l(place).
+s(x).
 ts(z).
 
 0.6::trusts(amazon, azure).
@@ -24,19 +25,21 @@ ts(z).
 
 func(notification, [], 3, kotlin, 10).
 func(distance, [pos1, pos2], 2, python, 20).
-func(true, [x], 1, python, 5).
+func(true, [], 1, python, 5).
+func(computePlace, [place], 1, python, 10).
+func(formatData, [pos1], 3, java, 10).
 
-0.5::trigger(contactsService, triggerZ, notification).
+0.5::trigger(webserver, triggerZ, notification).
 
 rule(triggerZ, [eu, us]).
 
 labelResource(position, android, sensors, s).
 labelResource(contacts_log, asl, files, ts).
-labelResource(places, asl, files, l).
+labelResource(places, asl, files, ts).
 
-%service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(webserver, triggerX, whl(true, seq(read(position, android, sensors, pos1), send(contactsService, [pos1], 1))), 3, [ubuntu], [eu]).
-service(contactsService, triggerY, seq(read(contacts_log, asl, files, pos2), seq(ife(distance, write(pos1, contacts_log, asl), tau), send(placesService, [pos1], 0.8))), 4, [ubuntu, sql], [eu]).
+%service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).  whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], placesService, 1))))
+service(webserver, triggerX,  whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], placesService, 1)))), 3, [ubuntu], [eu]).
+service(contactsService, triggerY, seq(read(contacts_log, asl, files, pos2), seq(ife(distance, write(pos1, contacts_log, asl), tau), seq(computePlace, send([place], placesService, 0.8)))), 4, [ubuntu, sql], [eu]).
 service(placesService, triggerZ, seq(write(pos1, places, asl, files), fireTrigger(triggerZ)), 2, [sql], [eu, us]).
 
 0.7::responseTime(contactsService, 0.5).
@@ -46,4 +49,4 @@ service(placesService, triggerZ, seq(write(pos1, places, asl, files), fireTrigge
 0.2::responseTime(placesService, 1).
 
 %app(OpA, AId, [SIds]).
-app(app1, [webserver, contactsService, placesService]).
+app(app1, [webserver, placesService]).

@@ -17,6 +17,18 @@ body {
   height: 100%;
 }
 
+.button {
+  background-color: lightgray;
+  border: none;
+  text-align: center;
+  font-size: small;
+  top: 80vh;
+  left: 80%;
+  width: 100px;
+  height: 50px;
+  text-decoration: none;
+}
+
 .parallax-bg {
   background-image: url(back.jpg);
   position: absolute;

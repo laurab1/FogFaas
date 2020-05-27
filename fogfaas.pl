@@ -142,8 +142,9 @@ ctx(AOp, ife(FId, P1, P2), L, Env, NewEnv, History, NewHistory) :-
    ctx(AOp, P2, L, TmpEnv, NewEnv, History, NewHistory).
 ctx(AOp, whl(FId, P), L, Env, NewEnv, History, NewHistory) :-
    func(FId, Args, _, _, _),
-   labelF(AOp, Args, L),
-   guardCheck(AOp, L),
+   labelF(AOp, Args, L1),
+   guardCheck(AOp, L1),
+   leq2(AOp, L1, L),
    union(Env, Args, TmpEnv),
    ctx(AOp, P, L, TmpEnv, NewEnv, History, NewHistory).
 ctx(AOp, trc(P1, P2), L, Env, NewEnv, History, NewHistory) :- 
