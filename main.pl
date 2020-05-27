@@ -14,6 +14,6 @@ query(placeApp(default, app1, SP, FP)).
 
 %query(isConnected(N, n1, L, LinkLatency)).
 
-query(ctx(default, whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], contactsService, 1)))), L, [], Env, [], Hist)).
+%query(ctx(default, seq(write(place, places, asl, files), fireTrigger(triggerZ)), L, [], Env, [], Hist)).
 
 %query(ctx(default, ife(sum, sum, send([x], service1, 1)), L, [x], Env)).

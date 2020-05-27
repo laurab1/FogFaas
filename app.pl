@@ -35,7 +35,7 @@ rule(triggerZ, [eu, us]).
 
 labelResource(position, android, sensors, s).
 labelResource(contacts_log, asl, files, ts).
-labelResource(places, asl, files, l).
+labelResource(places, asl, files, ts).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).  whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], placesService, 1))))
 service(webserver, triggerX,  whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], contactsService, 1)))), 3, [ubuntu], [eu]).
