@@ -86,7 +86,7 @@ supports(AOp,NId,ts) :- labelN(AOp,NId,ts).
 
 % default trust model à la SecFog
 trusts(X,X).               
-trusts2(A,B) :- trusts(A,B).   
+trusts2(A,B) :- trusts(A,B).
 trusts2(A,B) :- trusts(A,C),trusts2(C,B), A \== B.
 
 checkTime(tau, 0).

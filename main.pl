@@ -4,9 +4,9 @@
 
 %query(placeFunctions(default, (service1, n1), [(service1, n1),(service2,n2), (service3, n3)], send([x], service3, 1), [], R, [], C)).
 
-%query(placeServices(default, [service1, service2, service3], [], P, [], C)).
+query(placeServices(default, [webserver, contactsService, placesService], [], P, [], C)).
 
-query(placeApp(default, app1, SP, FP)).
+%query(placeApp(default, app1, SP, FP)).
 
 %query(placeAllFunctions(default, [(service1, n1),(service2,n2), (service3, n3)], [(service1, n1),(service2,n2), (service3, n3)], [], NewFPlacement, NewCaps)).
 

@@ -116,8 +116,6 @@ guardCheck(default, l).
 
 trusts(default, amazon).
 
-
-
 %security context
 ctx(_, tau, _ , _, _, _, _).
 ctx(AOp, par(F1, F2), L, Env, NewEnv, History, History) :- 

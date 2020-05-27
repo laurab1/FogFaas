@@ -60,8 +60,13 @@ body {
 
 .content {
   width: 70%;
+  line-height: auto;
   text-align: left;
   font-size: 30px;
+}
+
+li{
+  margin: 15px 0;
 }
 
 .subtitle {

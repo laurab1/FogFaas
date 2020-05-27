@@ -12,38 +12,36 @@ labelN(default, N, OpN, Geo, l) :-
 
 %%%%%%%%%%%%%%%% App %%%%%%%%%%%%%%%%
 
-ts(z).
-s(x).
-l(y).
-l(t).
+s(pos1).
+s(pos2).
+
+0.6::trusts(amazon, azure).
+0.2::trusts(amazon, ibm).
 
 % functions
 
-func(sum, [x,y], 1, rust, 10).
-func(mult,[y,t], 1, java, 10).
-func(div, [z,z], 2, python, 20).
+func(notification, [], 3, kotlin, 10).
+func(distance, [pos1, pos2], 2, python, 20).
 func(true, [], 1, python, 5).
 
-0.6::trigger(service3, triggerX, sum).
-0.4::trigger(service2, triggerX, sum).
-trigger(service2, triggerY, div).
-0.2::trigger(service3, triggerZ, div).
-0.8::trigger(service2, triggerZ, div).
+0.5::trigger(contactsService, triggerZ, notification).
 
-rule(triggerX, [eu]).
-rule(triggerY, [us]).
 rule(triggerZ, [eu, us]).
 
+labelResource(position, android, sensors, s).
+labelResource(contacts_log, asl, files, ts).
+labelResource(places, asl, files, l).
+
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(service1, triggerX, seq(seq(sum, fireTrigger(triggerZ)), fireTrigger(triggerX)), 1, [ubuntu], [eu]).
-service(service2, triggerY, div, 1, [sql], [us]).
-service(service3, triggerX, seq(sum, send([x], service1, 1)), 1, [ubuntu], [eu]).
+service(webserver, triggerX, whl(true, seq(read(position, android, sensor, pos1), send(contactsService, [pos1], 1))), [ubuntu], [eu]).
+service(contactsService, triggerY, seq(read(contacts_log, asl, files, pos2), seq(ife(distance, write(pos1, contacts_log, asl), tau), send(placesService, [pos1], 0.8))), 4, [ubuntu, sql], [eu]).
+service(placesService, triggerZ, seq(write(pos1, places, asl, files), fireTrigger(triggerZ)), 2, [sql], [eu, us]).
 
-0.7::responseTime(service1, 0.5).
-0.3::responseTime(service1, 2).
-
-%0.7::responseTime(service3, 0.5).
-%0.3::responseTime(service3, 2).
+0.7::responseTime(contactsService, 0.5).
+0.3::responseTime(contactsService, 2).
+0.4::responseTime(placesService, 0.3).
+0.4::responseTime(placesService, 0.7).
+0.2::responseTime(placesService, 1).
 
 %app(OpA, AId, [SIds]).
-app(app1, [service1, service2, service3]).
+app(app1, [webserver, contactsService, placesService]).
