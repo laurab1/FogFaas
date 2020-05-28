@@ -38,9 +38,21 @@ labelResource(contacts_log, asl, files, ts).
 labelResource(places, asl, files, ts).
 
 %service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
-service(webserver, triggerX,  whl(true, seq(read(position, android, sensors, pos1), seq(formatData, send([pos1], contactsService, 1)))), 3, [ubuntu], [eu]).
-service(contactsService, triggerY, whl(true, seq(read(contacts_log, asl, files, pos2), ife(distance, seq(computePlace, send([place], placesService, 0.8)), computePlace))), 2, [ubuntu, sql], [eu]).
-service(placesService, triggerZ, seq(write(place, places, asl, files), fireTrigger(triggerZ)), 2, [sql], [eu, us]).
+service(webserver, triggerX,  
+    whl(true, 
+        seq(read(position, android, sensors, pos1), 
+            seq(formatData, 
+                send([pos1], contactsService, 1)))), 3, [ubuntu], [eu]).
+
+service(contactsService, triggerY, 
+    whl(true, 
+        seq(read(contacts_log, asl, files, pos2), 
+            ife(distance, 
+                seq(computePlace, send([place], placesService, 0.8)), 
+                computePlace))), 2, [ubuntu, sql], [eu]).
+                
+service(placesService, triggerZ, 
+    seq(write(place, places, asl, files), fireTrigger(triggerZ)), 2, [sql], [eu, us]).
 
 0.7::responseTime(contactsService, 0.5).
 0.3::responseTime(contactsService, 2).
