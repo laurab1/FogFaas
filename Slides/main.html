@@ -47,7 +47,8 @@
           </p>
           <ul class="content">
             <li>Fog computing is a big challenge for security.</li>
-            <li>SecFog is a useful tool which allows to securely deploy an application on an
+            <li>SecFog is a useful tool which allows to compute and compare 
+              a set of secure deployments of an application on an
               infrastructure (i.e. to solve the Components Deployment Problem).
             </li>
             <li>What about the FaaS paradigm?</li>
@@ -58,11 +59,11 @@
             FogFaas
           </p>
           <ul class="content">
-            <li>FogFaas is a problog tool which allows to solve the CDP taking into
-              account the FaaS paradigm.
+            <li>FogFaas is a problog tool which extends SecFog by providing some support
+              for FaaS applications.
             </li>
             <li>The basic idea is simple: an application is a list of services (orchestrators),
-              a service is a composition of functions.
+              and a service is a composition of functions.
             </li>
             <li>Functions can be also triggered as needed.</li>
           </ul>
@@ -75,7 +76,7 @@
             <li>We provide functions a security label which depends on the labelling of
               parameters.
             </li>
-            <li>The default labelling is \( \{l, \ s, \ ts \}\), with  \(l \lt s \lt ts\).
+            <li>The default set of labels is \( \{l, \ s, \ ts \}\), with  \(l \lt s \lt ts\).
             </li>
             <li>This can be easily defined with few lines of code.</li>
             <button id="0" class="button">
@@ -222,7 +223,7 @@
             <li>We provide default security requirements, but users can define their own
               \(labelN\) predicate in order to customize the labelling.
             </li>
-            <li>FogFaas also embed the trust model of SecFog to provide a trustness
+            <li>FogFaas also embeds the trust model of SecFog to provide a trustness
               relation between an application operator (the deployer) and a network
               operator (the owner of a node).
             </li>
