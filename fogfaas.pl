@@ -108,7 +108,7 @@ leq(default, l, s).
 leq(default, s, ts).
 
 labelF(default, Args, ts).
-labelF(default, rgs, s) :- findall(X, ts(X, Args), []).
+labelF(default, Args, s) :- findall(X, ts(X, Args), []).
 labelF(default, Args, l) :- findall(X, notPublic(X, Args), []).
 notPublic(X, Args) :-  member(X, Args),(ts(X);s(X)). 
 ts(X, Args) :- member(X, Args), ts(X).
