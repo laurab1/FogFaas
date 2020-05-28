@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.min.css">
+    <link rel="stylesheet" href="style/main_style.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://unpkg.com/swiper/js/swiper.js"></script>
+    <script src="https://unpkg.com/swiper/js/swiper.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="swiper-container">
+    <div class="parallax-bg" data-swiper-parallax="-23%">
+      <a class="freepik-link" href="https://www.freepik.com/free-photos-vectors/background">Background by rawpixel.com - www.freepik.com</a>
+    </div>
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <p class="title">
+            Covert channels
+          </p>
+          <ul class="content">
+            <li>Mechanisms for signaling information through a 
+              computing system are known as channels.
+            </li>
+            <li>Channels that exploit a mechanism whose primary 
+              purpose is not information transfer are called covert channels; 
+              they pose the greatest challenge in preventing improper information leaks.
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit Flows – Leak 1
+          </p>
+          <ul class="content">
+            <li>if(hi > 0) { lo = 99 }
+            </li>
+            <li>There is a leak here, because the type system allow usage of lower secret label under high guard.
+            </li>
+            <ul class="content" style="font-size: medium;">
+              <li>
+                “Leaks the sign of guard, not its value"
+              </li>
+            </ul>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit flows - Solution 1
+          </p>
+          <ul class="content">
+            <li>ctx(AOp, ife(FId, P1, P2), L) :- <br>
+              func(FId, Args, _, _, _),<br>
+              labelF(AOp, Args, L),<br>
+              ctx(AOp, P1, L),<br>
+              ctx(AOp, P2, L).</li>
+            <li>The problem solved during the implementation in class by enforcing "guard",
+              "then" and "else" parts having the same label that is highest among all of them.
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit Flows – Leak 2
+          </p>
+          <ul class="content">
+            <li>if(hi > 0) { <br>
+              skip; <br>
+              skip; <br>
+            } else {
+              skip;
+            }
+            </li>
+            <li>The problem is execution time, the attacker can get sign of hi because then and else part have different execution time.
+            </li>
+            <ul class="content" style="font-size: medium;">
+              <li>
+                “Leaks the sign of hi, not its value"
+              </li>
+            </ul>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit flows - Solution 2
+          </p>
+          <ul class="content">
+            <li>ctx(AOp, ife(FId, P1, P2), TUnits, L) :-
+              func(FId, Args, _, _, _),<br>
+              labelF(AOp, Args, L),<br>
+              ctx(AOp, P1,TUnitsT, L), <br>
+              ctx(AOp, P2,TUnitsE, L), <br>
+              TUnitsT == TUnitsE,
+              TUnits is TUnitsT. </li>
+            <li>Solution is checking time units of then and else part but under then and else there could be another  
+              If then else, while loop, try catch, or sequential programs.
+            </li>
+            <li>
+              We need to change other indicator to be able to get sequential sum of programs
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit flows - Solution 2 - Functions
+          </p>
+          <ul class="content">
+            <li>
+              ctx(AOp, FId, TUnits,L) :- <br>
+              func(FId, Args, _, _, TUnits), % TUnits = Computational time for FId <br>
+              labelF(AOp, Args, L). </li>
+            <li>Just get time unit of function and assign it as time unit of program
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit flows - Solution 2 - Sequential Program
+          </p>
+          <ul class="content">
+            <li>              
+              ctx(AOp, seq(P1, P2), SeqTUnits,L) :- <br>
+              ctx(AOp, P1, FstTUnits, L),<br>
+              ctx(AOp, P2, SndTUnits, L),<br>
+              SeqTUnits is FstTUnits + SndTUnits. </li>
+            <li>Sum up time units of first and second program and assign it as sequential time units
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit flows - Solution 2 - Try Catch
+          </p>
+          <ul class="content">
+            <li>              
+              ctx(AOp, trc(P1, P2), TUnitsTRC ,L) :- 
+                ctx(AOp, P1, TTUnits, L), <br> 
+                ctx(AOp, P2, CTUnits, L),  <br>
+                TTUnits == CTUnits, <br>
+                TUnitsTRC is TTUnits. </li>
+            <li>We assumed try and catch have same logic with the if then else, therefore, we
+               checked  time units of try and catch and assigned time units of try as time units of try catch
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit Flows – Solution 2 – While
+          </p>
+          <ul class="content">
+            <li>              
+              ctx(AOp, whl(FId, P), TUnitsW, L) :- <br>
+                func(FId, Args, _, _, CTUnits),<br>
+                labelF(AOp, Args, L),<br>
+                guardCheck(L),<br>
+                ctx(AOp, P, BTunits, L),<br>
+                TUnitsW is CTUnits + BTunits.</li>
+            <li> Time units of while must represent in program as infinity.
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Implicit Flows – Leak 2
+          </p>
+          <ul class="content">
+            <li>while(ts) { <br>
+              skip; <br>
+              skip; <br>
+            }
+            </li>
+            <li>The problem comes from termination and non-termination. 
+            </li>
+            <li>Type system allows while to have secret labeled arguments inside the guard.
+            </li>
+            <ul class="content" style="font-size: medium;">
+              <li>
+                “Leaks the sign of ts, not its value"
+              </li>
+            </ul>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Termination Channels - Solution
+          </p>
+          <ul class="content">
+            <li>              
+              ctx(AOp, whl(FId, P), TUnitsW, L) :- <br>
+                func(FId, Args, _, _, CTUnits),<br>
+                labelF(AOp, Args, L),<br>
+                guardCheck(L),<br>
+                ctx(AOp, P, BTunits, L),<br>
+                TUnitsW is CTUnits + BTunits.</li>
+            <li>We considered to add a guard checker to check label inside the guard, therefore, if there is a forbidden label it will fail.
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Termination Channels - Solution
+          </p>
+          <ul class="content">
+            <li>              
+              guardCheck(X):- not(X = ts),<br>
+                not(X = s),<br>
+                not(X = ts_eu),<br>
+                not(X = ts_us),<br>
+                not(X = s_eu),<br>
+                not(X = s_us).</li>
+            <li>The forbidden labels defined by the operator under guardCheck predicate
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+  <script src="js/swiper.js"></script>
+  </body>
+</html>
