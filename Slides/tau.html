@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.min.css">
+    <link rel="stylesheet" href="style/main_style.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://unpkg.com/swiper/js/swiper.js"></script>
+    <script src="https://unpkg.com/swiper/js/swiper.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="swiper-container">
+    <div class="parallax-bg" data-swiper-parallax="-23%">
+      <a class="freepik-link" href="https://www.freepik.com/free-photos-vectors/background">Background by rawpixel.com - www.freepik.com</a>
+    </div>
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <p class="title">
+            Adding operations on resources
+          </p>
+          <ul class="content">
+            <li>We expanded the language with operations on resources (e.g. files, sensors...)
+            </li>
+            <li>Three new language constructs:
+              <ul class="content">
+                <li>new(Res, CD, COI, LRes)</li>
+                <li>read(Res, CD, COI, Var)</li>
+                <li>write(Var, Res, CD, COI)</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Access control (Chinese wall model)
+          </p>
+            <ul class="content">
+              <li>Organize resources in conflict of interest classes (e.g. banks) and company datasets (e.g. Barclays) </li>
+              <li>History-based</li>
+            </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Access control (Chinese wall model)
+          </p>
+            <ul class="content">
+                  <li>S can <b>read</b> O if:  
+                    <ul class="content">
+                      <li>S already read something in CD(O)</li>
+                      <li>S never read anything in COI(O)</li>
+                    </ul>
+                  </li>
+                  <li>S can <b>write</b> O if:  
+                    <ul class="content">
+                      <li>S can read O</li>
+                      <li>S never read O' in the same COI of O and different CD</li>
+                    </ul>
+                  </li>
+                </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Information flow
+          </p>
+            <ul class="content">
+              <li>Operations on resources could be used to leak information if not handled properly</li>
+              <li>Example: <br>
+                % x is a ts variable <br>
+                % f is a l file <br>
+                write(x, _, _, f). <br>
+              </li>
+            </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Information flow
+          </p>
+            <ul class="content">
+              <li>Add two new rules to the type system<br><br></li>
+              <li>
+                <img src="style/read_rule.png" style="width: 60%;"><br><br>
+              </li>
+              <li>
+                <img src="style/write_rule.png" style="width: 60%;"><br><br>
+              </li>
+            </ul>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+  <script src="js/swiper.js"></script>
+  </body>
+</html>

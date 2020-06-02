@@ -1,0 +1,58 @@
+\documentclass[../DraftNotes.tex]{subfiles}
+
+\begin{document}
+
+In Serverless computing, also known as functions-as-a-service, we are writing short-running, stateless functions that can be triggered by events generated from services or users.
+
+In Faas, a program consists of one or more rules. 
+
+A rule is constructed by the when combinator over a given trigger and action.
+
+So, We have to create a rule to register an action as a new consumer of a trigger.
+
+I defined the rules like this.
+    
+\begin{verbatim}
+    rule(RuleName, TriggerId, ActionId).
+\end{verbatim}
+
+When we deploy an application, we had placed Services and Functions. 
+
+I also did Trigger placement in this part. 
+
+\begin{verbatim}
+    placeApp(AOp, AId, ...):-
+        app(AId, Services),
+        placeServices(AOp, Services, ...),
+        placeTriggers(AOp, Triggers, ...),
+        placeAllFunctions(AOp, ...).
+\end{verbatim}
+
+And we are using these triggers in the services. So it is defined in services like this.
+
+    service(SId, Trigger, Program, HWReqs, PReqs, GeoReqList, TimeUnits).
+
+
+I defined trigger in our application like this.
+
+\begin{verbatim}
+    trigger(TId, Prog, Rule).
+\end{verbatim}
+
+Here, triggers are uniquely identified by a TId. This trigger will fire Action `Prog`.
+
+
+To fire a Trigger, I added a fireTrigger function and function placement.
+
+    placeFunctions(AOp, SId, fireTrigger(TId), ...)
+
+And security context of `fireTrigger` function is like this.
+
+\begin{verbatim}
+	ctxFire(AOp, fireTrigger(TId), L) :-
+        trigger(TId, FId, _),
+        func(FId, Args, _, _, _),
+        labelF(AOp, Args, L). 
+\end{verbatim}
+
+\end{document}
