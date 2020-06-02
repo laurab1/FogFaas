@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.min.css">
+    <link rel="stylesheet" href="style/main_style.css">
+    <link rel="stylesheet" href="style/trigger.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://unpkg.com/swiper/js/swiper.js"></script>
+    <script src="https://unpkg.com/swiper/js/swiper.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="swiper-container">
+    <div class="parallax-bg" data-swiper-parallax="-23%">
+      <a class="freepik-link" href="https://www.freepik.com/free-photos-vectors/background">Background by rawpixel.com - www.freepik.com</a>
+    </div>
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <p class="title" style="top: 10vh; font-size: 70px;">
+            Triggers in FAAS
+          </p>
+          <img src="style/unipi.png" style="width: 30%;">
+          <p class="subtitle">
+            Modelling Triggers in Serverless Application
+          </p>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Trigger
+          </p>
+          <ul class="content">
+            <li>
+              Aplication is a list of the services.
+              <code>app(app1, [service1, service2]).</code>
+            </li>
+            <li>
+              Each service is a set of the stateless functions.
+              <code>func(sum, [x,y], 1, rust, 10).</code>
+              <code>func(div, [z,z], 2, python, 20).</code>
+            </li>
+            <li>
+              Each service has an event that should trigger activation of the functions.
+              <code>service(service1, triggerX, sum, 1, [ubuntu], [eu]).</code>
+              <code>service(service2, triggerY, div, 1, [sql], [eu]).</code>
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Modelling Trigger
+          </p>
+          <ul class="content">
+            <li>
+              We are using triggers to activate functions in a service when some event occurs.
+              <code>trigger(contactsService, triggerZ, notification).</code>
+            </li>
+            <li>A rule is part of a trigger and we use it for an association from trigger to action.</li>
+            <li>
+              Rule contains triggerID and its configuration parameters.
+              <code>rule(triggerZ, [eu, us]).</code>
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <p class="title">
+            Fire Trigger
+          </p>
+          <ul class="content">
+            <li>When the invocation of action completes, the invocation fires the associated completion trigger.</li>
+            <li>when the completion trigger of `a` fires, it schedules an invocation of action `b`.</li>
+            <button id="0" class="button" style="width: auto !important;">
+              Function Placement
+            </button>
+            <div id="modal0" class="w3-modal" style="position: absolute;">
+              <div class="w3-modal-content w3-animate-top w3-card-4 w3-animate-opacity" style="background-color: lightgray; padding: 10px 10px;">
+                <span id="0" class="close" style="color: gray; cursor: pointer;">&times;</span>
+                <code class="content">
+                  placeFunctions(AOp, (SId, Node), ServicePlacement, fireTrigger(TId), ...) :-
+                  <br/>trigger(Service, TId, FId),
+                  <br/>func(FId, Args, HwReqs, PReqs, TUnits),
+                  <br/>node(NId, OpN, HwCaps, SPlats, FPlats, CostPU, Geo),
+                  <br/>trusts2(AOp, OpN),
+                  <br/>checkPlatforms(PReqs, FPlats),
+                  <br/>checkContext(AOp, Args, NId, OpN, Geo, L),
+                  <br/>HwReqs =< HwCaps, checkHw(HwCaps, HwReqs, NId, Caps, NewCaps).
+                </li>
+                </code>
+              </div>
+            </div>
+            <li>labeling function for fireTrigger.</li>
+            <button id="1" class="button" style="width: auto !important;">
+              Security Contex
+            </button>
+            <div id="modal1" class="w3-modal" style="position: absolute;">
+              <div class="w3-modal-content w3-animate-top w3-card-4 w3-animate-opacity" style="background-color: lightgray; padding: 10px 10px;">
+                <span id="1" class="close" style="color: gray; cursor: pointer;">&times;</span>
+                <code class="content">
+                  ctx(AOp, fireTrigger(TId), L, Env, Env, History, History) :-
+                  <br/>trigger(SId, TId, FId),
+                  <br/>func(FId, Args, _, _, _),
+                  <br/>labelF(AOp, Args, L),
+                  <br/>service(SId, _, Prog, _, _, Geo),
+                  <br/>rule(TId, Geos),
+                  <br/>subset(Geo, Geos),
+                  <br/>ctx(AOp, Prog, L2, [], ServEnv, [], ServHistory),
+                  <br/>leq2(AOp, L2, L). 
+                </code>
+              </div>
+            </div>
+          </ul>
+          
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+  <script src="js/swiper.js"></script>
+  </body>
+</html>
