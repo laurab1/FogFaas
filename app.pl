@@ -1,15 +1,3 @@
-%%%%%%%%%%%%%%%% User defined predicates %%%%%%%%%%%%%%%%
-% labels a node with its security context
-labelN(default, N, OpN, Geo, ts) :- 
-                            member(Geo, [eu,ch]), 
-                            firewall(N), 
-                            member(OpN, [amazon, azure]).
-labelN(default, N, OpN, Geo, s) :- 
-                            member(Geo, [eu,ch,us]).
-labelN(default, N, OpN, Geo, l) :- 
-                            member(Geo, [eu,ch,us,vat]).
-
-
 %%%%%%%%%%%%%%%% App %%%%%%%%%%%%%%%%
 
 ts(pos1).

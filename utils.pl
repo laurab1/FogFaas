@@ -1,3 +1,17 @@
+%Copyright [2020] [Laura Bussi, Alessandro Di Giorgio, Selman Alpdundar, Tabriz Hajiev]
+
+%   Licensed under the Apache License, Version 2.0 (the "License");
+%   you may not use this file except in compliance with the License.
+%   You may obtain a copy of the License at
+
+%       http://www.apache.org/licenses/LICENSE-2.0
+
+%   Unless required by applicable law or agreed to in writing, software
+%   distributed under the License is distributed on an "AS IS" BASIS,
+%   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%   See the License for the specific language governing permissions and
+%   limitations under the License.
+
 :- use_module(library(lists)).
 :- use_module(library(assert)).
 
@@ -78,6 +92,17 @@ labelL(AOp, L, Lbl) :-
                     node(N2, OpN, _, _, _, _, Geo),
                     labelN(AOp, N1, OpN, Geo, Lbl),
                     labelN(AOp, N2, OpN, Geo, Lbl).
+
+% labels a node with its security context
+labelN(default, N, OpN, Geo, ts) :- 
+                            member(Geo, [eu,ch]), 
+                            firewall(N), 
+                            member(OpN, [amazon, azure]).
+labelN(default, N, OpN, Geo, s) :- 
+                            member(Geo, [eu,ch,us]).
+labelN(default, N, OpN, Geo, l) :- 
+                            member(Geo, [eu,ch,us,vat]).
+
 
 % checks if node label supports function label
 supports(AOp,NId,l) :- labelN(AOp,NId,_).
